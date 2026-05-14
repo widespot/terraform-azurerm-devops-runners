@@ -1,0 +1,86 @@
+locals {
+  resource_group_name_default = coalesce(var.resource_group_name, "${var.name}-rg")
+  resource_group_name         = var.resource_group_create ? azurerm_resource_group.resource_group[0].name : data.azurerm_resource_group.resource_group[0].name
+  resource_group_location     = var.resource_group_create ? azurerm_resource_group.resource_group[0].location : data.azurerm_resource_group.resource_group[0].location
+
+  network_name_default = coalesce(var.network_name, "${var.name}-vnet")
+  network_cidr         = var.network_create ? one(azurerm_virtual_network.network[0].address_space) : one(data.azurerm_virtual_network.network[0].address_space)
+  network_name         = var.network_create ? azurerm_virtual_network.network[0].name : data.azurerm_virtual_network.network[0].name
+
+  subnet_cidr_default = coalesce(var.subnet_cidr, cidrsubnet(local.network_cidr, 2, 0))
+  subnet_id           = var.subnet_create ? azurerm_subnet.subnet[0].id : data.azurerm_subnet.subnet[0].id
+
+  nat_gateway_name_default = "${var.name}-nat"
+}
+
+resource "azurerm_resource_group" "resource_group" {
+  count = var.resource_group_create ? 1 : 0
+
+  location = var.location
+  name     = local.resource_group_name_default
+}
+data "azurerm_resource_group" "resource_group" {
+  count = var.resource_group_create ? 0 : 1
+
+  name = local.resource_group_name_default
+}
+
+resource "azurerm_virtual_network" "network" {
+  count = var.network_create ? 1 : 0
+
+  name                = local.network_name_default
+  address_space       = [var.network_cidr]
+  location            = local.resource_group_location
+  resource_group_name = local.resource_group_name
+}
+data "azurerm_virtual_network" "network" {
+  count = var.network_create ? 0 : 1
+
+  name                = local.network_name_default
+  resource_group_name = local.resource_group_name
+}
+
+resource "azurerm_subnet" "subnet" {
+  count = var.subnet_create ? 1 : 0
+
+  name                 = var.subnet_name
+  resource_group_name  = local.resource_group_name
+  virtual_network_name = local.network_name
+  address_prefixes     = [local.subnet_cidr_default]
+}
+data "azurerm_subnet" "subnet" {
+  count = var.subnet_create ? 0 : 1
+
+  name                 = var.subnet_name
+  resource_group_name  = local.resource_group_name
+  virtual_network_name = local.network_name
+}
+
+resource "azurerm_public_ip" "nat" {
+  count               = var.nat_gateway_create ? 1 : 0
+  name                = "${local.nat_gateway_name_default}-ip"
+  location            = local.resource_group_location
+  resource_group_name = local.resource_group_name
+  allocation_method   = "Static"
+  sku                 = "Standard"
+}
+
+resource "azurerm_nat_gateway" "nat" {
+  count               = var.nat_gateway_create ? 1 : 0
+  name                = local.nat_gateway_name_default
+  location            = local.resource_group_location
+  resource_group_name = local.resource_group_name
+  sku_name            = "Standard"
+}
+
+resource "azurerm_nat_gateway_public_ip_association" "nat" {
+  count                = var.nat_gateway_create ? 1 : 0
+  nat_gateway_id       = azurerm_nat_gateway.nat[0].id
+  public_ip_address_id = azurerm_public_ip.nat[0].id
+}
+
+resource "azurerm_subnet_nat_gateway_association" "nat" {
+  count          = var.nat_gateway_create ? 1 : 0
+  subnet_id      = local.subnet_id
+  nat_gateway_id = azurerm_nat_gateway.nat[0].id
+}
