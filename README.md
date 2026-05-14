@@ -154,3 +154,9 @@ No modules.
 ```shell
 terraform-docs markdown table --output-file README.md --indent 3 .
 ```
+
+## TODO
+* [ ] Support for Windows images
+* [ ] multiple runner pools
+* [ ] Support for image building from dev VM
+* [ ] Move packer to separate repo
