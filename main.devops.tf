@@ -44,9 +44,33 @@ resource "azuredevops_elastic_pool" "runners_pool" {
   time_to_live_minutes   = var.runner_ttl_minutes
   recycle_after_each_use = var.runner_recycle_after_each_use
 
-  auto_provision = false
+  auto_provision = true
   auto_update    = true
   project_id     = data.azuredevops_project.project.id
+
+  # Updating the VMSS inplace must trigger a replacement of the the elastic pool
+  # A simple change in a VMSS parameter indeed can lead to clearing the settings of the Extension.
+  # Since The Elastic pool do not continuously enforce the setting of the VMSS extension, the
+  # Newly instantiatied VM will miss the setting, and won't connect to AzDo
+  #
+  #  az vmss extension set \
+  #--resource-group test-runner-rg \
+  #--vmss-name test-runner-vmss \
+  #--name Microsoft.Azure.DevOps.Pipelines.Agent \
+  #--publisher Microsoft.VisualStudio.Services \
+  #--settings @settings.json
+
+  lifecycle {
+    replace_triggered_by = [
+      azurerm_linux_virtual_machine_scale_set.runner[0]
+    ]
+
+    create_before_destroy = false
+  }
+
+  depends_on = [
+    azurerm_linux_virtual_machine_scale_set.runner[0]
+  ]
 }
 
 #resource "azuredevops_agent_queue" "runner" {

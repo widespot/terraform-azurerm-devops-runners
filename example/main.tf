@@ -29,12 +29,14 @@ module "runner" {
   source = "../"
 
   name = "test-runner"
-  devops_project_name = "oncall-shared"
-  vm_ssh_public_key = file("~/.ssh/id_rsa.pub")
-  dev_vms_count = 1
+  devops_project_name = "project-name"
 
-  # Uncomment once the image is created
   vm_image_name = var.vm_image_name
+  vm_ssh_public_key = file("~/.ssh/id_rsa.pub")
+  vm_admin_password = "Password1!"
+
+  dev_vms_count = 1
+  dev_vm_image_id = "/subscriptions/f9da3531-9249-48b4-b5e9-707a8f643b40/resourceGroups/test-runner-rg/providers/Microsoft.Compute/images/test-runner-vmimg"
 
   artifacts = {
     rocky = {

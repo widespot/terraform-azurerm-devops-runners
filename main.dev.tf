@@ -1,5 +1,8 @@
+locals {
+  dev_vm_image_id = coalesce(var.dev_vm_image_id, local.vm_image_id)
+}
 resource "azurerm_network_interface" "dev_network_interface" {
-  count = local.vm_image_id == null ? 0 : var.dev_vms_count
+  count = local.dev_vm_image_id == null ? 0 : var.dev_vms_count
 
   name                = "${local.vm_name}-${count.index}-nic"
   location            = local.resource_group_location
@@ -15,7 +18,7 @@ resource "azurerm_network_interface" "dev_network_interface" {
 }
 
 resource "azurerm_public_ip" "dev_ip" {
-  count = local.vm_image_id == null ? 0 : var.dev_vms_count
+  count = local.dev_vm_image_id == null ? 0 : var.dev_vms_count
 
   allocation_method   = "Static"
   location            = local.resource_group_location
@@ -24,7 +27,7 @@ resource "azurerm_public_ip" "dev_ip" {
 }
 
 resource "azurerm_virtual_machine" "dev_vm" {
-  count = local.vm_image_id == null ? 0 : var.dev_vms_count
+  count = local.dev_vm_image_id == null ? 0 : var.dev_vms_count
 
   name = "${local.vm_name}-${count.index}"
 
@@ -35,7 +38,7 @@ resource "azurerm_virtual_machine" "dev_vm" {
   vm_size               = coalesce(var.dev_vm_size, var.vm_size)
 
   storage_image_reference {
-    id = local.vm_image_id
+    id = local.dev_vm_image_id
   }
 
   delete_os_disk_on_termination = true
@@ -48,10 +51,10 @@ resource "azurerm_virtual_machine" "dev_vm" {
   os_profile {
     computer_name  = "${local.vm_name}-${count.index}"
     admin_username = var.vm_admin_username
-    admin_password = var.vm_admin_password
+    admin_password = var.dev_vm_admin_password
   }
   os_profile_linux_config {
-    disable_password_authentication = var.vm_admin_password != null ? false : true
+    disable_password_authentication = var.dev_vm_admin_password != null ? false : true
 
     dynamic "ssh_keys" {
       for_each = var.vm_ssh_public_key == null ? [] : [0]
@@ -69,7 +72,7 @@ resource "azurerm_virtual_machine" "dev_vm" {
 }
 
 resource "azurerm_network_security_group" "dev_nsg" {
-  count = local.vm_image_id == null || var.dev_vms_count == 0 ? 0 : 1
+  count = local.dev_vm_image_id == null || var.dev_vms_count == 0 ? 0 : 1
 
   name                = "${local.vm_name}-dev-nsg"
   location            = local.resource_group_location
@@ -101,7 +104,7 @@ resource "azurerm_network_security_group" "dev_nsg" {
 }
 
 resource "azurerm_network_interface_security_group_association" "dev_nsg_association" {
-  count = local.vm_image_id == null ? 0 : var.dev_vms_count
+  count = local.dev_vm_image_id == null ? 0 : var.dev_vms_count
 
   network_interface_id      = azurerm_network_interface.dev_network_interface[count.index].id
   network_security_group_id = azurerm_network_security_group.dev_nsg[0].id

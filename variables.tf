@@ -106,7 +106,7 @@ variable "vm_image_name" {
 }
 variable "vm_image_id" {
   type        = string
-  description = "The full resource ID of the custom image to use for the VMs. Overrides `vm_image_name` if both are provided."
+  description = "The full resource ID of the custom image to use for the VMs. When null, and `vm_image_name` is not null, value is /subscriptions/$${subscription_id}/resourceGroups/$${resource_group_name}/providers/Microsoft.Compute/images/$${vm_image_name}"
   default     = null
 }
 
@@ -119,6 +119,16 @@ variable "dev_vm_size" {
   type        = string
   default     = null
   description = "Size of the development VMs. Default is the value of `vm_size`"
+}
+variable "dev_vm_admin_password" {
+  type        = string
+  default     = null
+  description = "The password for the administrator user."
+}
+variable "dev_vm_image_id" {
+  type        = string
+  default     = null
+  description = "Image id for the dev machine. When null, value is `vm_image_id`"
 }
 
 
@@ -166,7 +176,7 @@ variable "runner_ttl_minutes" {
 variable "runner_recycle_after_each_use" {
   type        = bool
   description = "Whether Azure DevOps should tear down and recreate the VM after every job execution."
-  default     = true
+  default     = false
 }
 
 variable "artifacts_storage_create" {
