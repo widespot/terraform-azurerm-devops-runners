@@ -3,14 +3,21 @@ set -euo pipefail
 
 export DEBIAN_FRONTEND=noninteractive
 
-# Downloading and installing HashiCorp’s GPG signing key
-wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-# This does not install anything. It just prints the cryptographic fingerprint of the key so you can verify it matches
-# HashiCorp’s published fingerprint
-gpg --no-default-keyring \
-  --keyring /usr/share/keyrings/hashicorp-archive-keyring.gpg \
-  --fingerprint
-# add Hashicorp repository
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-# Install Packer
-sudo DEBIAN_FRONTEND=noninteractive apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y packer
+VERSION=1.15.3
+echo "==== Download zip archive, checksum and checksum signature ..."
+wget https://releases.hashicorp.com/packer/${VERSION}/packer_${VERSION}_linux_amd64.zip
+wget https://releases.hashicorp.com/packer/${VERSION}/packer_${VERSION}_SHA256SUMS
+wget https://releases.hashicorp.com/packer/${VERSION}/packer_${VERSION}_SHA256SUMS.sig
+echo "==== Trust Hashicorp signing key ..."
+gpg --keyserver keyserver.ubuntu.com --recv-keys C820C6D5CD27AB87
+echo "==== Verify signature ..."
+gpg --verify packer_${VERSION}_SHA256SUMS.sig packer_${VERSION}_SHA256SUMS
+echo "==== Verify zip consistency ..."
+sha256sum -c packer_${VERSION}_SHA256SUMS --ignore-missing
+echo "==== Unzip binary ..."
+unzip packer_${VERSION}_linux_amd64.zip
+echo "==== Install binary ..."
+sudo mv packer /usr/local/bin/
+
+echo "==== Packer version ===="
+packer --version
