@@ -1,5 +1,5 @@
 locals {
-  dev_vm_image_id = coalesce(var.dev_vm_image_id, local.vm_image_id)
+  dev_vm_image_id = try(coalesce(var.dev_vm_image_id, local.vm_image_id), null)
 }
 resource "azurerm_network_interface" "dev_network_interface" {
   count = local.dev_vm_image_id == null ? 0 : var.dev_vms_count
