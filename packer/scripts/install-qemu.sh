@@ -4,6 +4,9 @@ set -euo pipefail
 
 export DEBIAN_FRONTEND=noninteractive
 
+# UEFI firmware environment.
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ovmf
+
 # Enable access to KVM
 # We want to add the default user to the kvm group.
 # Since the user is created at instantiation time, we use a cloud-init per-instance script.
