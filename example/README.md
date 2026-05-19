@@ -11,7 +11,8 @@
 
 3. Build the image
     ```shell
-    packer build -var-file=packer.pkrvars.hcl ../packer
+    git clone git@github.com:widespot/packer-azure-debian-builder.git
+    packer build -var-file=packer.pkrvars.hcl ./packer-azure-debian-builder
     ```
 
 4. and execute

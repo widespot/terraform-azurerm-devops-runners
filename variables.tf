@@ -77,7 +77,7 @@ variable "vm_size" {
 variable "vm_disk_size_gb" {
   type        = number
   description = "Size for the primary disk of the VMs, in Gb"
-  default     = 30
+  default     = 50
 }
 variable "vm_init_instances" {
   type        = number
