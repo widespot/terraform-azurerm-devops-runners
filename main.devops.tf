@@ -1,6 +1,6 @@
 locals {
   devops_service_endpoint_name_default = coalesce(var.devops_service_endpoint_name, "${var.name}-endpoint")
-  devops_service_endpoint_id           = var.devops_service_endpoint_create ? azuredevops_serviceendpoint_azurerm.service_endpoint[0].id : data.azuredevops_serviceendpoint_azurerm.service_endpoint[0].id
+  devops_service_endpoint_id           = coalesce(var.devops_service_endpoint_id, var.devops_service_endpoint_create ? azuredevops_serviceendpoint_azurerm.service_endpoint[0].id : data.azuredevops_serviceendpoint_azurerm.service_endpoint[0].id)
 }
 
 data "azuredevops_project" "project" {
@@ -11,7 +11,7 @@ data "azurerm_subscription" "subscription" {
 }
 
 resource "azuredevops_serviceendpoint_azurerm" "service_endpoint" {
-  count = var.devops_service_endpoint_create ? 1 : 0
+  count = var.devops_service_endpoint_create && var.devops_service_endpoint_id == null ? 1 : 0
 
   azurerm_spn_tenantid      = data.azurerm_subscription.subscription.tenant_id
   azurerm_subscription_id   = data.azurerm_subscription.subscription.subscription_id
@@ -25,7 +25,7 @@ resource "azuredevops_serviceendpoint_azurerm" "service_endpoint" {
 }
 
 data "azuredevops_serviceendpoint_azurerm" "service_endpoint" {
-  count = var.devops_service_endpoint_create ? 0 : 1
+  count = var.devops_service_endpoint_create || var.devops_service_endpoint_id != null ? 0 : 1
 
   project_id            = data.azuredevops_project.project.id
   service_endpoint_name = local.devops_service_endpoint_name_default

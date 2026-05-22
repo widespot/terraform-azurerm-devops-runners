@@ -1,2 +1,3 @@
 *.back
 /packer-azure-debian-builder/
+providers.tf

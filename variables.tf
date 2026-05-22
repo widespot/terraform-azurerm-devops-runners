@@ -149,6 +149,12 @@ variable "devops_service_endpoint_name" {
   description = "The name of the AzureRM service connection to use. If null, it defaults to the `name` variable followed by `-endpoint`."
 }
 
+variable "devops_service_endpoint_id" {
+  type        = string
+  description = "Id of the Azure DevOps Service endpoint to use. When not provided, the id is taken from either the existing or a newly created `devops_service_endpoint_name` Service Endpoint, based on the `devops_service_endpoint_create` variable."
+  default     = null
+}
+
 variable "runners_pool_name" {
   type        = string
   description = "The name of the Azure DevOps elastic agent pool. If null, it defaults to the `name` variable."

@@ -1,0 +1,12 @@
+
+provider "azurerm" {
+  features {}
+
+  resource_provider_registrations = "none"
+  # Visual Studio Professional Subscription
+  subscription_id = "00000000-0000-0000-0000-000000000000"
+}
+
+provider "azuredevops" {
+  org_service_url = "https://dev.azure.com/widespot"
+}

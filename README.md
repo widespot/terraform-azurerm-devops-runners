@@ -55,14 +55,14 @@ An example of this procedure is available in the [example](example) folder.
 ### Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_azuredevops"></a> [azuredevops](#requirement\_azuredevops) | >= 1.0.0 |
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.49.0 |
 
 ### Providers
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="provider_azuredevops"></a> [azuredevops](#provider\_azuredevops) | >= 1.0.0 |
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.49.0 |
 
@@ -73,7 +73,7 @@ No modules.
 ### Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [azuredevops_elastic_pool.runners_pool](https://registry.terraform.io/providers/microsoft/azuredevops/latest/docs/resources/elastic_pool) | resource |
 | [azuredevops_serviceendpoint_azurerm.service_endpoint](https://registry.terraform.io/providers/microsoft/azuredevops/latest/docs/resources/serviceendpoint_azurerm) | resource |
 | [azurerm_linux_virtual_machine_scale_set.runner](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/linux_virtual_machine_scale_set) | resource |
@@ -104,8 +104,8 @@ No modules.
 ### Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| <a name="input_artifacts"></a> [artifacts](#input\_artifacts) | A map of artifacts to upload to the storage container. The key is the blob name, and the value is an object with `source` (path to local file) and optional `content_type`. | <pre>map(object({<br>    source       = string<br>    content_type = optional(string, "application/octet-stream")<br>  }))</pre> | `{}` | no |
+| ---- | ----------- | ---- | ------- | :------: |
+| <a name="input_artifacts"></a> [artifacts](#input\_artifacts) | A map of artifacts to upload to the storage container. The key is the blob name, and the value is an object with `source` (path to local file) and optional `content_type`. | <pre>map(object({<br/>    source       = string<br/>    content_type = optional(string, "application/octet-stream")<br/>  }))</pre> | `{}` | no |
 | <a name="input_artifacts_container_name"></a> [artifacts\_container\_name](#input\_artifacts\_container\_name) | The name of the storage container for artifacts. | `string` | `"artifacts"` | no |
 | <a name="input_artifacts_storage_account_name"></a> [artifacts\_storage\_account\_name](#input\_artifacts\_storage\_account\_name) | The name of the storage account for artifacts. If null, it defaults to the `name` variable (sanitized). | `string` | `null` | no |
 | <a name="input_artifacts_storage_create"></a> [artifacts\_storage\_create](#input\_artifacts\_storage\_create) | Whether to create the artifact storage account and container. | `bool` | `true` | no |
@@ -115,6 +115,7 @@ No modules.
 | <a name="input_dev_vms_count"></a> [dev\_vms\_count](#input\_dev\_vms\_count) | The number of standalone development VMs to create for testing the image. | `number` | `0` | no |
 | <a name="input_devops_project_name"></a> [devops\_project\_name](#input\_devops\_project\_name) | The name of the Azure DevOps project where the runner pool will be created. | `string` | n/a | yes |
 | <a name="input_devops_service_endpoint_create"></a> [devops\_service\_endpoint\_create](#input\_devops\_service\_endpoint\_create) | Whether to create a new AzureRM service connection in Azure DevOps. | `bool` | `true` | no |
+| <a name="input_devops_service_endpoint_id"></a> [devops\_service\_endpoint\_id](#input\_devops\_service\_endpoint\_id) | Id of the Azure DevOps Service endpoint to use. When not provided, the id is taken from either the existing or a newly created `devops_service_endpoint_name` Service Endpoint, based on the `devops_service_endpoint_create` variable. | `string` | `null` | no |
 | <a name="input_devops_service_endpoint_name"></a> [devops\_service\_endpoint\_name](#input\_devops\_service\_endpoint\_name) | The name of the AzureRM service connection to use. If null, it defaults to the `name` variable followed by `-endpoint`. | `string` | `null` | no |
 | <a name="input_location"></a> [location](#input\_location) | The Azure region where resources will be created. | `string` | `"westeurope"` | no |
 | <a name="input_name"></a> [name](#input\_name) | Base name for the runner pool and associated resources. | `string` | n/a | yes |
@@ -146,7 +147,7 @@ No modules.
 ### Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_artifacts"></a> [artifacts](#output\_artifacts) | n/a |
 | <a name="output_artifacts_container_name"></a> [artifacts\_container\_name](#output\_artifacts\_container\_name) | n/a |
 | <a name="output_artifacts_download_example"></a> [artifacts\_download\_example](#output\_artifacts\_download\_example) | n/a |
