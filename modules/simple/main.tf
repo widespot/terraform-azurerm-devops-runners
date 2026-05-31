@@ -2,6 +2,13 @@ locals {
   resource_group_name_default = coalesce(var.resource_group_name, "${var.name}-rg")
   resource_group_name         = var.resource_group_create ? azurerm_resource_group.resource_group[0].name : data.azurerm_resource_group.resource_group[0].name
   resource_group_location     = var.resource_group_create ? azurerm_resource_group.resource_group[0].location : data.azurerm_resource_group.resource_group[0].location
+
+  vm_identity_name = coalesce(var.vm_identity_name, "${var.name}-id")
+  vm_identity_id = azurerm_user_assigned_identity.runner.id
+  vm_identity_principal_id = azurerm_user_assigned_identity.runner.principal_id
+}
+
+data "azurerm_subscription" "subscription" {
 }
 
 resource "azurerm_resource_group" "resource_group" {
@@ -36,7 +43,7 @@ module "network" {
 }
 
 resource "azurerm_user_assigned_identity" "runner" {
-  name                = coalesce(var.vm_identity_name, "${var.name}-id")
+  name                = local.vm_identity_name
   location            = local.resource_group_location
   resource_group_name = local.resource_group_name
 }
@@ -44,15 +51,21 @@ resource "azurerm_user_assigned_identity" "runner" {
 module "registry" {
   source = "../registry"
 
-  for_each = var.artifacts_storage_create ? {registry = {}} : {}
+  count = var.registry_storage_account_create ? 1 : 0
 
-  storage_account_name    = var.registry_storage_account_name
+  storage_account_name    = coalesce(var.registry_storage_account_name, replace(lower("${var.name}artifacts"), "/[^a-z0-9]/", ""))
   resource_group_name     = local.resource_group_name
   resource_group_location = local.resource_group_location
 
   container_name = var.registry_container_name
 
-  runner_principal_ids           = [azurerm_user_assigned_identity.runner.id]
+  runner_principal_ids           = { runner = local.vm_identity_principal_id }
+
+  depends_on = [
+    azurerm_user_assigned_identity.runner
+  ]
+
+  artifacts = var.artifacts
 }
 
 module "runner" {
@@ -64,7 +77,9 @@ module "runner" {
 
   subnet_id = module.network.subnet_id
 
-  vm_identity_id = azurerm_user_assigned_identity.runner.id
+  vm_identity_name    = local.vm_identity_name
+  # Because azurerm_user_assigned_identity.runner is listed as dependency, we expect the identity to exist
+  vm_identity_create  = false
 
   vm_name = var.vm_name
   vm_admin_username = var.vm_admin_username
@@ -96,9 +111,14 @@ module "runner" {
   devops_service_endpoint_id = var.devops_service_endpoint_id
   devops_service_endpoint_name = var.devops_service_endpoint_name
 
-  artifacts_storage_mount = var.artifacts_storage_create && var.registry_mount_enabled ? {var.registry_storage_account_name = {
-    mount_path = var.registry_mount_path
-    blobfuse_cache_path = var.registry_mount_cache_path
-    read_only = var.registry_mount_read_only
+  registry_storage_mounts = var.registry_storage_account_create && var.registry_mount_enabled ? {(module.registry[0].storage_account_name) = {
+    mount_path          = var.registry_mount_path
+    cache_path          = var.registry_mount_cache_path
+    read_only           = var.registry_mount_read_only
+    container_name      = module.registry[0].container_name
   }} : {}
+
+  depends_on = [
+    azurerm_user_assigned_identity.runner
+  ]
 }

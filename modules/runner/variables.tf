@@ -24,11 +24,15 @@ variable "vm_identity_id" {
   default     = null
   description = "Id of the existing identity to assign to the runner VMs and dev VMs"
 }
-# TODO allow no vm identity creation when not needed
 variable "vm_identity_name" {
   type        = string
   description = "The name of the VM User Assigned Identity to create if `vm_identity_id` is not provided. When null, it defaults to the `name` variable followed by `-id`."
   default     = null
+}
+variable "vm_identity_create" {
+  type        = bool
+  description = "Should the vm identity be created if no `vm_identity_id` is provided"
+  default     = true
 }
 variable "vm_name" {
   type        = string
@@ -179,12 +183,13 @@ variable "devops_runner_recycle_after_each_use" {
   default     = false
 }
 
-variable "artifacts_storage_mount" {
+variable "registry_storage_mounts" {
   # key = storage_account_name
   type        = map(object({
     mount_path = optional(string, null) # /mnt/artifacts/each.key
-    blobfuse_cache_path = optional(string, null) # /var/cache/blobfuse2/
+    cache_path = optional(string, null) # /var/cache/blobfuse2/
     read_only = optional(bool, true)
+    container_name = string
   }))
   description = "The name of the storage account for artifacts. If null, it defaults to the `name` variable (sanitized)."
   default     = {}

@@ -2,8 +2,8 @@ locals {
   resource_group_name     = var.resource_group_name
   resource_group_location = var.resource_group_location != null ? var.resource_group_location : data.azurerm_resource_group.resource_group[0].location
 
-  vm_identity_name = coalesce(var.vm_identity_name, "${var.name}-id")
-  vm_identity_id   = var.vm_identity_id != null ? var.vm_identity_id : azurerm_user_assigned_identity.runner[0].id
+  vm_identity_default_name = coalesce(var.vm_identity_name, "${var.name}-id")
+  vm_identity_id           = var.vm_identity_id != null ? var.vm_identity_id : var.vm_identity_create ? azurerm_user_assigned_identity.runner[0].id: data.azurerm_user_assigned_identity.runner[0].id
 
   vm_image_id      = var.vm_image_id != null ? var.vm_image_id : (var.vm_image_name == null ? null : "/subscriptions/${data.azurerm_subscription.subscription.subscription_id}/resourceGroups/${local.resource_group_name}/providers/Microsoft.Compute/images/${var.vm_image_name}")
   vm_name          = coalesce(var.vm_name, "${var.name}-vm")
@@ -19,10 +19,17 @@ data "azurerm_resource_group" "resource_group" {
 }
 
 resource "azurerm_user_assigned_identity" "runner" {
-  count = var.vm_identity_id == null ? 1 : 0
+  count = var.vm_identity_id == null && var.vm_identity_create ? 1 : 0
 
-  name                = local.vm_identity_name
+  name                = local.vm_identity_default_name
   location            = local.resource_group_location
+  resource_group_name = local.resource_group_name
+}
+
+data "azurerm_user_assigned_identity" "runner" {
+  count = var.vm_identity_id == null && !var.vm_identity_create ? 1 : 0
+
+  name                = local.vm_identity_default_name
   resource_group_name = local.resource_group_name
 }
 
@@ -45,7 +52,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "runner" {
 
   admin_username = var.vm_admin_username
   admin_password = var.vm_admin_password
-  custom_data    = local.artifacts_mount_enabled ? base64encode(local.artifacts_mount_cloud_init) : null
+  custom_data    = length(var.registry_storage_mounts) > 0 ? base64encode(local.registry_mount_cloud_init) : null
   dynamic "admin_ssh_key" {
     for_each = var.vm_admin_ssh_public_key == null ? [] : [0]
     content {

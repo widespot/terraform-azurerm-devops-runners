@@ -26,6 +26,10 @@ resource "azurerm_public_ip" "dev_ip" {
   resource_group_name = local.resource_group_name
 }
 
+resource "terraform_data" "cloud_init" {
+  input = length(var.registry_storage_mounts) > 0 ? sha256(local.registry_mount_cloud_init) : null
+}
+
 resource "azurerm_virtual_machine" "dev_vm" {
   count = local.dev_vm_image_id == null ? 0 : var.dev_vms_count
 
@@ -53,15 +57,15 @@ resource "azurerm_virtual_machine" "dev_vm" {
     computer_name  = "${local.vm_name}-${count.index}"
     admin_username = var.vm_admin_username
     admin_password = var.dev_vm_admin_password
-    custom_data    = local.artifacts_mount_enabled ? base64encode(local.artifacts_mount_cloud_init) : null
+    custom_data    = length(var.registry_storage_mounts) > 0 ? base64encode(local.registry_mount_cloud_init) : null
   }
   os_profile_linux_config {
     disable_password_authentication = var.dev_vm_admin_password != null ? false : true
 
     dynamic "ssh_keys" {
-      for_each = var.vm_ssh_public_key == null ? [] : [0]
+      for_each = var.vm_admin_ssh_public_key == null ? [] : [0]
       content {
-        key_data = var.vm_ssh_public_key
+        key_data = var.vm_admin_ssh_public_key
         path     = "/home/${var.vm_admin_username}/.ssh/authorized_keys"
       }
     }
@@ -71,6 +75,14 @@ resource "azurerm_virtual_machine" "dev_vm" {
     type         = "UserAssigned"
     identity_ids = [local.vm_identity_id]
   }
+
+  lifecycle {
+    replace_triggered_by = [
+      # Workaround because terraform ignore change in os_profile.custom_data
+      terraform_data.cloud_init
+    ]
+  }
+
 }
 
 resource "azurerm_network_security_group" "dev_nsg" {
@@ -103,6 +115,18 @@ resource "azurerm_network_security_group" "dev_nsg" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
+
+  /*security_rule {
+    name                       = "DenyVnetInBound"
+    priority                   = 4096
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "VirtualNetwork"
+  }*/
 }
 
 resource "azurerm_network_interface_security_group_association" "dev_nsg_association" {

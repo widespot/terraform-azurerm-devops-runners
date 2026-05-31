@@ -1,3 +1,3 @@
 output "subnet_id" {
-  value = local.subnet_cidr_default
+  value = local.subnet_id
 }

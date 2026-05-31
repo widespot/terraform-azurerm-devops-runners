@@ -89,16 +89,11 @@ resource "azurerm_network_security_group" "subnet_nsg" {
     name                       = "DenyInterSubnetTraffic"
     priority                   = 4096
     direction                  = "Inbound"
-    access                     = "Deny"
+    access                     = "Allow"
     protocol                   = "*"
     source_port_range          = "*"
     destination_port_range     = "*"
     source_address_prefix      = "VirtualNetwork"
     destination_address_prefix = "VirtualNetwork"
   }
-}
-
-resource "azurerm_subnet_network_security_group_association" "subnet_nsg_assoc" {
-  subnet_id                 = local.subnet_id
-  network_security_group_id = azurerm_network_security_group.subnet_nsg.id
 }

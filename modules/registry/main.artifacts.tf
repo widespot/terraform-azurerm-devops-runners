@@ -2,7 +2,7 @@ locals {
   resource_group_name     = var.resource_group_name
   resource_group_location = var.resource_group_location != null ? var.resource_group_location : data.azurerm_resource_group.resource_group[0].location
 
-  artifacts_storage_account_name = var.storage_account_name
+  storage_account_name = var.storage_account_name
 }
 
 data "azurerm_resource_group" "resource_group" {
@@ -12,9 +12,9 @@ data "azurerm_resource_group" "resource_group" {
 }
 
 resource "azurerm_storage_account" "artifacts" {
-  count = var.artifacts_storage_create ? 1 : 0
+  count = var.storage_account_create ? 1 : 0
 
-  name                     = local.artifacts_storage_account_name
+  name                     = local.storage_account_name
   resource_group_name      = local.resource_group_name
   location                 = local.resource_group_location
   account_tier             = "Standard"
@@ -26,7 +26,7 @@ resource "azurerm_storage_account" "artifacts" {
 }
 
 resource "azurerm_storage_container" "artifacts" {
-  count = var.artifacts_storage_create ? 1 : 0
+  count = var.storage_account_create ? 1 : 0
 
   name                  = var.container_name
   storage_account_id    = azurerm_storage_account.artifacts[0].id
@@ -34,15 +34,15 @@ resource "azurerm_storage_container" "artifacts" {
 }
 
 resource "azurerm_role_assignment" "runner_storage_reader" {
-  for_each = var.artifacts_storage_create ? toset(var.runner_principal_ids) : {}
+  for_each = var.storage_account_create ? var.runner_principal_ids : {}
 
   scope                = azurerm_storage_account.artifacts[0].id
   role_definition_name = "Storage Blob Data Reader"
-  principal_id         = each.key
+  principal_id         = each.value
 }
 
 resource "azurerm_storage_blob" "artifacts" {
-  for_each = var.artifacts_storage_create ? var.artifacts : {}
+  for_each = var.storage_account_create ? var.artifacts : {}
 
   name                   = each.key
   storage_account_name   = azurerm_storage_account.artifacts[0].name

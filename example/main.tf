@@ -14,13 +14,13 @@ terraform {
 }
 
 module "runner" {
-  source = "../"
+  source = "../modules/simple"
 
   name = "tempo-runner"
   devops_project_name = var.devops_project_name
 
   vm_image_name = "tempo-runner-vmimg3"
-  vm_ssh_public_key = file("~/.ssh/id_rsa.pub")
+  vm_admin_ssh_public_key = file("~/.ssh/id_rsa.pub")
   vm_admin_password = "Password1!"
 
   dev_vms_count = 1

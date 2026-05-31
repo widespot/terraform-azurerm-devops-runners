@@ -9,17 +9,13 @@ output "packer_pkrvars" {
 }
 
 output "artifacts_storage_account_name" {
-  value = var.artifacts_storage_create ? azurerm_storage_account.artifacts[0].name : null
-}
-
-output "artifacts_container_name" {
-  value = var.artifacts_storage_create ? azurerm_storage_container.artifacts[0].name : null
+  value = var.registry_storage_account_create ? module.registry[0].storage_account_name : null
 }
 
 output "artifacts_mount_path" {
-  value = var.artifacts_storage_create && var.registry_mount_enabled ? var.registry_mount_path : null
+  value = var.registry_storage_account_create && var.registry_mount_enabled ? var.registry_mount_path : null
 }
 
 output "artifacts_download_example" {
-  value = var.artifacts_storage_create ? "az login --identity && az storage blob download --account-name ${azurerm_storage_account.artifacts[0].name} --container-name ${azurerm_storage_container.artifacts[0].name} --name <blob_name> --file <destination_path> --auth-mode login" : null
+  value = var.registry_storage_account_create ? "az login --identity && az storage blob download --account-name ${module.registry[0].storage_account_name} --container-name ${module.registry[0].storage_account_name} --name <blob_name> --file <destination_path> --auth-mode login" : null
 }

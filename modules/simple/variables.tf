@@ -210,7 +210,7 @@ variable "devops_runner_recycle_after_each_use" {
   default     = false
 }
 
-variable "artifacts_storage_create" {
+variable "registry_storage_account_create" {
   type        = bool
   description = "Whether to create the artifact storage account and container."
   default     = true
