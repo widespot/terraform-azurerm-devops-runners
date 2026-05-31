@@ -212,25 +212,25 @@ variable "artifacts" {
   default     = {}
 }
 
-variable "artifacts_blobfuse_mount_enabled" {
+variable "artifacts_mount_enabled" {
   type        = bool
   description = "Whether to mount the artifacts blob container on all runner instances using Blobfuse2 with managed identity."
   default     = true
 }
 
-variable "artifacts_blobfuse_mount_path" {
+variable "artifacts_mount_path" {
   type        = string
   description = "Path where the artifacts blob container is mounted on runner instances."
   default     = "/mnt/artifacts"
 }
 
-variable "artifacts_blobfuse_tmp_path" {
+variable "artifacts_blobfuse_cache_path" {
   type        = string
   description = "Local cache path used by Blobfuse2."
-  default     = "/mnt/blobfuse2tmp"
+  default     = "/var/cache/blobfuse2"
 }
 
-variable "artifacts_blobfuse_mount_read_only" {
+variable "artifacts_mount_read_only" {
   type        = bool
   description = "Whether to mount the artifacts blob container in read-only mode on runner instances."
   default     = true
