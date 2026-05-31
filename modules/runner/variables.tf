@@ -60,7 +60,7 @@ variable "vm_admin_password" {
   default     = null
   description = "The password for the administrator user. Either `vm_admin_password` or `vm_ssh_public_key` must be provided."
 }
-variable "vm_ssh_public_key" {
+variable "vm_admin_ssh_public_key" {
   type        = string
   default     = null
   description = "The SSH public key for the administrator user. Example: `file(\"~/.ssh/id_rsa.pub\")`. Either `vm_admin_password` or `vm_ssh_public_key` must be provided."
@@ -81,20 +81,49 @@ variable "dev_vms_count" {
   description = "The number of standalone development VMs to create for testing the image."
   default     = 0
 }
+variable "dev_vm_name_prefix" {
+  type        = string
+  default     = null
+  description = "Prefix for the dev vm name"
+}
 variable "dev_vm_size" {
   type        = string
   default     = null
   description = "Size of the development VMs. Default is the value of `vm_size`"
 }
+variable "dev_vm_admin_username" {
+  type        = string
+  default     = null
+  description = "Admin username of the dev vms. Default is `vm_admin_username`"
+}
 variable "dev_vm_admin_password" {
   type        = string
   default     = null
-  description = "The password for the administrator user."
+  description = "The password for the administrator user. Default is `vm_admin_username`"
 }
+
+variable "dev_vm_admin_ssh_public_key" {
+  type        = string
+  default     = null
+  description = "Public ssh key for the admin user on the dev machines. Default is `vm_admin_ssh_public_key`"
+}
+
 variable "dev_vm_image_id" {
   type        = string
   default     = null
   description = "Image id for the dev machine. When null, value is `vm_image_id`"
+}
+
+variable "dev_vm_image_name" {
+  type        = string
+  default     = null
+  description = "The name of the custom image to use for the VMs. The image is expected to be in the same resource group."
+}
+
+variable "dev_vm_disk_size_gb" {
+  type        = number
+  default     = null
+  description = "Size for the primary disk of the dev VMs, in Gb"
 }
 
 variable "devops_project_name" {

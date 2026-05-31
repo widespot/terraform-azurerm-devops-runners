@@ -14,7 +14,7 @@ resource "azurerm_resource_group" "resource_group" {
 }
 
 data "azurerm_resource_group" "resource_group" {
-  count = var.resource_group_create ? 1 : 0
+  count = var.resource_group_create ? 0 : 1
 
   name = var.resource_group_name
 }
@@ -46,7 +46,7 @@ resource "azurerm_user_assigned_identity" "runner" {
 }
 
 module "registries" {
-  source = "modules/registries"
+  source = "modules/registry"
 
   for_each = var.registries
 
@@ -54,7 +54,7 @@ module "registries" {
   resource_group_name     = local.resource_group_name
   resource_group_location = local.resource_group_location
 
-  runner_principal_ids           = [for runner in local.registry_runners[each.key] : "${var.name}-${runner}-id"]
+  runner_principal_ids = [for runner in local.registry_runners[each.key] : azurerm_user_assigned_identity.runner[runner].id]
 }
 
 module "runners" {
@@ -68,9 +68,39 @@ module "runners" {
 
   subnet_id = module.network.subnet_id
 
-  devops_project_name = each.value.devops_project_name
+  vm_identity_id = azurerm_user_assigned_identity.runner[each.key].id
 
-  artifacts_storage_mount = {for k, v in each.value.registries: module.registries[k].storage_account_name => {
+  vm_name = each.value.vm_name
+  vm_size = each.value.vm_size
+  vm_init_instances = each.value.vm_init_instances
+  vm_image_id = each.value.vm_image_id
+  vm_image_name = each.value.vm_image_name
+  vm_disk_size_gb = each.value.vm_disk_size_gb
+  vm_admin_username = each.value.vm_admin_username
+  vm_admin_password = each.value.vm_admin_password
+  vm_admin_ssh_public_key = each.value.vm_admin_ssh_public_key
+
+  dev_vm_name_prefix = each.value.dev_vm_name_prefix
+  dev_vm_size = each.value.dev_vm_size
+  dev_vm_disk_size_gb = each.value.dev_vm_disk_size_gb
+  dev_vms_count = each.value.dev_vm_count
+  dev_vm_image_id = each.value.dev_vm_image_id
+  dev_vm_image_name = each.value.dev_vm_image_name
+  dev_vm_admin_username = each.value.dev_vm_admin_username
+  dev_vm_admin_password = each.value.dev_vm_admin_password
+  dev_vm_admin_ssh_public_key = each.value.dev_vm_admin_ssh_public_key
+
+  devops_project_name = each.value.devops_project_name
+  devops_runner_recycle_after_each_use = null
+  devops_runner_ttl_minutes = null
+  devops_runners_count_max = null
+  devops_runners_count_min = null
+  devops_runners_pool_name =  null
+  devops_service_endpoint_create = null
+  devops_service_endpoint_id = null
+  devops_service_endpoint_name = null
+
+  artifacts_storage_mount = {for registry, v in each.value.registries: module.registries[registry].storage_account_name => {
     mount_path = v.mount_path
     blobfuse_cache_path = v.blobfuse_cache_path
     read_only = v.read_only

@@ -25,7 +25,7 @@ variable "artifacts_storage_create" {
   default     = true
 }
 
-variable "artifacts_container_name" {
+variable "container_name" {
   type        = string
   description = "The name of the storage container for artifacts."
   default     = "artifacts"

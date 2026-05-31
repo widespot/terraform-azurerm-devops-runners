@@ -28,7 +28,7 @@ resource "azurerm_storage_account" "artifacts" {
 resource "azurerm_storage_container" "artifacts" {
   count = var.artifacts_storage_create ? 1 : 0
 
-  name                  = var.artifacts_container_name
+  name                  = var.container_name
   storage_account_id    = azurerm_storage_account.artifacts[0].id
   container_access_type = "private"
 }

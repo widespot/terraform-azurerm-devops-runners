@@ -47,10 +47,10 @@ resource "azurerm_linux_virtual_machine_scale_set" "runner" {
   admin_password = var.vm_admin_password
   custom_data    = local.artifacts_mount_enabled ? base64encode(local.artifacts_mount_cloud_init) : null
   dynamic "admin_ssh_key" {
-    for_each = var.vm_ssh_public_key == null ? [] : [0]
+    for_each = var.vm_admin_ssh_public_key == null ? [] : [0]
     content {
       username   = var.vm_admin_username
-      public_key = var.vm_ssh_public_key
+      public_key = var.vm_admin_ssh_public_key
     }
   }
 
