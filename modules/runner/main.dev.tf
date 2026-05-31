@@ -10,7 +10,7 @@ resource "azurerm_network_interface" "dev_network_interface" {
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = local.subnet_id
+    subnet_id                     = var.subnet_id
     private_ip_address_allocation = "Dynamic"
     primary                       = true
     public_ip_address_id          = azurerm_public_ip.dev_ip[count.index].id
@@ -69,7 +69,7 @@ resource "azurerm_virtual_machine" "dev_vm" {
 
   identity {
     type         = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.runner.id]
+    identity_ids = [local.vm_identity_id]
   }
 }
 

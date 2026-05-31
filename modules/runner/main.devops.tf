@@ -34,15 +34,15 @@ data "azuredevops_serviceendpoint_azurerm" "service_endpoint" {
 resource "azuredevops_elastic_pool" "runners_pool" {
   count = local.vm_image_id == null ? 0 : 1
 
-  name                   = coalesce(var.runners_pool_name, var.name)
+  name                   = coalesce(var.devops_runners_pool_name, var.name)
   azure_resource_id      = azurerm_linux_virtual_machine_scale_set.runner[0].id
   service_endpoint_id    = local.devops_service_endpoint_id
   service_endpoint_scope = data.azuredevops_project.project.id
 
-  desired_idle           = var.runners_count_min
-  max_capacity           = var.runners_count_max
-  time_to_live_minutes   = var.runner_ttl_minutes
-  recycle_after_each_use = var.runner_recycle_after_each_use
+  desired_idle           = var.devops_runners_count_min
+  max_capacity           = var.devops_runners_count_max
+  time_to_live_minutes   = var.devops_runner_ttl_minutes
+  recycle_after_each_use = var.devops_runner_recycle_after_each_use
 
   auto_provision = true
   auto_update    = true

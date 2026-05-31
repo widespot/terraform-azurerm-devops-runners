@@ -1,72 +1,78 @@
 locals {
-  vm_identity_name = coalesce(var.vm_identity_name, "${var.name}-id")
-  vm_image_id      = var.vm_image_id != null ? var.vm_image_id : (var.vm_image_name == null ? null : "/subscriptions/${data.azurerm_subscription.subscription.subscription_id}/resourceGroups/${local.resource_group_name}/providers/Microsoft.Compute/images/${var.vm_image_name}")
-  vm_name          = coalesce(var.vm_name, "${var.name}-vm")
-  vm_nic_name      = "${local.vm_name}-nic"
+  resource_group_name_default = coalesce(var.resource_group_name, "${var.name}-rg")
+  resource_group_name         = var.resource_group_create ? azurerm_resource_group.resource_group[0].name : data.azurerm_resource_group.resource_group[0].name
+  resource_group_location     = var.resource_group_create ? azurerm_resource_group.resource_group[0].location : data.azurerm_resource_group.resource_group[0].location
 
-  scale_set_name = "${var.name}-vmss"
+  registry_runners = {for registry in keys(var.registries): registry => [for runner in keys(var.runners): runner if contains(keys(var.runners[runner].registries), registry)]}
+}
+
+resource "azurerm_resource_group" "resource_group" {
+  count = var.resource_group_create ? 1 : 0
+
+  location = var.location
+  name     = local.resource_group_name_default
+}
+
+data "azurerm_resource_group" "resource_group" {
+  count = var.resource_group_create ? 1 : 0
+
+  name = var.resource_group_name
+}
+
+module "network" {
+  source = "modules/network"
+
+  name                    = var.name
+  resource_group_name     = local.resource_group_name
+  resource_group_location = local.resource_group_location
+
+  network_create  = var.network_create
+  network_name    = var.network_name
+  network_cidr    = var.network_cidr
+
+  subnet_create = var.subnet_create
+  subnet_name   = var.subnet_name
+  subnet_cidr   = var.subnet_cidr
+
+  nat_gateway_create = var.nat_gateway_create
 }
 
 resource "azurerm_user_assigned_identity" "runner" {
-  name                = local.vm_identity_name
+  for_each = var.runners
+
+  name                = "${var.name}-${each.key}-id"
   location            = local.resource_group_location
   resource_group_name = local.resource_group_name
 }
 
-resource "azurerm_linux_virtual_machine_scale_set" "runner" {
-  count = local.vm_image_id == null ? 0 : 1
+module "registries" {
+  source = "modules/registries"
 
-  name                = local.scale_set_name
-  location            = local.resource_group_location
-  resource_group_name = local.resource_group_name
+  for_each = var.registries
 
-  sku       = var.vm_size
-  instances = var.vm_init_instances
+  storage_account_name    = each.key
+  resource_group_name     = local.resource_group_name
+  resource_group_location = local.resource_group_location
 
-  source_image_id = local.vm_image_id
+  runner_principal_ids           = [for runner in local.registry_runners[each.key] : "${var.name}-${runner}-id"]
+}
 
-  disable_password_authentication = var.vm_admin_password != null ? false : true
-  overprovision                   = false
-  single_placement_group          = false
-  upgrade_mode                    = "Manual"
+module "runners" {
+  source = "modules/runner"
 
-  admin_username = var.vm_admin_username
-  admin_password = var.vm_admin_password
-  custom_data    = local.artifacts_mount_enabled ? base64encode(local.artifacts_mount_cloud_init) : null
-  dynamic "admin_ssh_key" {
-    for_each = var.vm_ssh_public_key == null ? [] : [0]
-    content {
-      username   = var.vm_admin_username
-      public_key = var.vm_ssh_public_key
-    }
-  }
+  for_each = var.runners
 
-  identity {
-    type         = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.runner.id]
-  }
+  name                    = each.key
+  resource_group_name     = local.resource_group_name
+  resource_group_location = local.resource_group_location
 
-  os_disk {
-    caching              = "ReadWrite"
-    storage_account_type = "StandardSSD_LRS"
-    disk_size_gb         = var.vm_disk_size_gb
-  }
+  subnet_id = module.network.subnet_id
 
-  network_interface {
-    name    = local.vm_nic_name
-    primary = true
+  devops_project_name = each.value.devops_project_name
 
-    ip_configuration {
-      name      = "internal"
-      primary   = true
-      subnet_id = local.subnet_id
-    }
-  }
-
-  lifecycle {
-    ignore_changes = [
-      instances,
-      tags,
-    ]
-  }
+  artifacts_storage_mount = {for k, v in each.value.registries: module.registries[k].storage_account_name => {
+    mount_path = v.mount_path
+    blobfuse_cache_path = v.blobfuse_cache_path
+    read_only = v.read_only
+  }}
 }

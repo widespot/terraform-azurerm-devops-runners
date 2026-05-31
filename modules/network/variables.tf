@@ -1,24 +1,17 @@
 variable "name" {
   type        = string
-  description = "Base name for the project."
-}
-
-variable "location" {
-  type        = string
-  description = "The Azure region where resources will be created."
-  default     = "westeurope"
-}
-
-variable "resource_group_create" {
-  type        = bool
-  default     = true
-  description = "Whether to create a new resource group or use an existing one."
+  description = "Base name for the runner pool and associated resources."
 }
 
 variable "resource_group_name" {
   type        = string
-  description = "The name of the resource group to create if `resource_group_create` is true, or use. If null, it defaults to the `name` variable followed by `-rg`."
+  description = "The name of the resource group to use."
+}
+
+variable "resource_group_location" {
+  type        = string
   default     = null
+  description = "The location of the resource group use. If not provided, the location is dynamically loaded thanks to a data block"
 }
 
 variable "network_create" {
@@ -45,7 +38,7 @@ variable "subnet_create" {
 variable "subnet_name" {
   type        = string
   description = "The name of the subnet to create if `subnet_create` is true, or to use."
-  default     = "runners"
+  default     = null
 }
 variable "subnet_cidr" {
   type        = string
@@ -57,24 +50,4 @@ variable "nat_gateway_create" {
   type        = bool
   description = "Whether to create a NAT Gateway for the subnet. The NAT gateway is required if subnet only delivers private IP address. Or the runners have no access to internet (and therefore no access to Azure DevOps)."
   default     = true
-}
-
-variable "registries" {
-  type = map(object({
-
-  }))
-  default = {}
-}
-
-variable "runners" {
-  type = map(object({
-
-    registries = map(object({
-      mount_path = optional(string, null) # /mnt/artifacts/each.key
-      blobfuse_cache_path = optional(string, null) # /var/cache/blobfuse2/
-      read_only = optional(bool, true)
-    }))
-
-    devops_project_name = string
-  }))
 }
