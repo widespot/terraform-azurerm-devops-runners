@@ -19,17 +19,18 @@ module "runner" {
   name = "tempo-runner"
   devops_project_name = var.devops_project_name
 
-  vm_image_name = var.vm_image_name
+  vm_image_name = "tempo-runner-vmimg3"
   vm_ssh_public_key = file("~/.ssh/id_rsa.pub")
   vm_admin_password = "Password1!"
 
-  #dev_vms_count = 1
-  #dev_vm_image_id = "/subscriptions/f9da3531-9249-48b4-b5e9-707a8f643b40/resourceGroups/test-runner-rg/providers/Microsoft.Compute/images/test-runner-vmimg"
+  dev_vms_count = 1
+  vm_size = "Standard_D8s_v5"
+  dev_vm_image_id = "/subscriptions/083e56a7-a090-4ad2-b62f-13b7e69fc648/resourceGroups/tempo-runner-rg/providers/Microsoft.Compute/images/tempo-runner-vmimg8"
 
   artifacts = {
-    #repo = {
-    #  source = "/Users/raphaeljoie/Downloads/Archive.zip"
-    #}
+    repo = {
+      source = "test-artifact.txt"
+    }
   }
 }
 

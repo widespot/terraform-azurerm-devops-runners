@@ -53,6 +53,7 @@ resource "azurerm_virtual_machine" "dev_vm" {
     computer_name  = "${local.vm_name}-${count.index}"
     admin_username = var.vm_admin_username
     admin_password = var.dev_vm_admin_password
+    custom_data    = local.artifacts_mount_enabled ? base64encode(local.artifacts_mount_cloud_init) : null
   }
   os_profile_linux_config {
     disable_password_authentication = var.dev_vm_admin_password != null ? false : true

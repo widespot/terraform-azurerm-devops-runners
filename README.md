@@ -106,7 +106,11 @@ No modules.
 | Name | Description | Type | Default | Required |
 | ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_artifacts"></a> [artifacts](#input\_artifacts) | A map of artifacts to upload to the storage container. The key is the blob name, and the value is an object with `source` (path to local file) and optional `content_type`. | <pre>map(object({<br/>    source       = string<br/>    content_type = optional(string, "application/octet-stream")<br/>  }))</pre> | `{}` | no |
+| <a name="input_artifacts_blobfuse_cache_path"></a> [artifacts\_blobfuse\_cache\_path](#input\_artifacts\_blobfuse\_cache\_path) | Local cache path used by Blobfuse2. | `string` | `"/var/cache/blobfuse2"` | no |
 | <a name="input_artifacts_container_name"></a> [artifacts\_container\_name](#input\_artifacts\_container\_name) | The name of the storage container for artifacts. | `string` | `"artifacts"` | no |
+| <a name="input_artifacts_mount_enabled"></a> [artifacts\_mount\_enabled](#input\_artifacts\_mount\_enabled) | Whether to mount the artifacts blob container on all runner instances using Blobfuse2 with managed identity. | `bool` | `true` | no |
+| <a name="input_artifacts_mount_path"></a> [artifacts\_mount\_path](#input\_artifacts\_mount\_path) | Path where the artifacts blob container is mounted on runner instances. | `string` | `"/mnt/artifacts"` | no |
+| <a name="input_artifacts_mount_read_only"></a> [artifacts\_mount\_read\_only](#input\_artifacts\_mount\_read\_only) | Whether to mount the artifacts blob container in read-only mode on runner instances. | `bool` | `true` | no |
 | <a name="input_artifacts_storage_account_name"></a> [artifacts\_storage\_account\_name](#input\_artifacts\_storage\_account\_name) | The name of the storage account for artifacts. If null, it defaults to the `name` variable (sanitized). | `string` | `null` | no |
 | <a name="input_artifacts_storage_create"></a> [artifacts\_storage\_create](#input\_artifacts\_storage\_create) | Whether to create the artifact storage account and container. | `bool` | `true` | no |
 | <a name="input_dev_vm_admin_password"></a> [dev\_vm\_admin\_password](#input\_dev\_vm\_admin\_password) | The password for the administrator user. | `string` | `null` | no |
@@ -151,6 +155,8 @@ No modules.
 | <a name="output_artifacts"></a> [artifacts](#output\_artifacts) | n/a |
 | <a name="output_artifacts_container_name"></a> [artifacts\_container\_name](#output\_artifacts\_container\_name) | n/a |
 | <a name="output_artifacts_download_example"></a> [artifacts\_download\_example](#output\_artifacts\_download\_example) | n/a |
+| <a name="output_artifacts_mount_cloud_init"></a> [artifacts\_mount\_cloud\_init](#output\_artifacts\_mount\_cloud\_init) | n/a |
+| <a name="output_artifacts_mount_path"></a> [artifacts\_mount\_path](#output\_artifacts\_mount\_path) | n/a |
 | <a name="output_artifacts_storage_account_name"></a> [artifacts\_storage\_account\_name](#output\_artifacts\_storage\_account\_name) | n/a |
 | <a name="output_packer_pkrvars"></a> [packer\_pkrvars](#output\_packer\_pkrvars) | n/a |
 <!-- END_TF_DOCS -->
