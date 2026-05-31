@@ -16,6 +16,10 @@ output "artifacts_container_name" {
   value = var.artifacts_storage_create ? azurerm_storage_container.artifacts[0].name : null
 }
 
+output "artifacts_blobfuse_mount_path" {
+  value = var.artifacts_storage_create && var.artifacts_blobfuse_mount_enabled ? var.artifacts_blobfuse_mount_path : null
+}
+
 output "artifacts" {
   value = var.artifacts_storage_create ? { for k, v in azurerm_storage_blob.artifacts : k => v.url } : {}
 }

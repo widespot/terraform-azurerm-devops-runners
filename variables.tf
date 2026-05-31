@@ -211,3 +211,27 @@ variable "artifacts" {
   description = "A map of artifacts to upload to the storage container. The key is the blob name, and the value is an object with `source` (path to local file) and optional `content_type`."
   default     = {}
 }
+
+variable "artifacts_blobfuse_mount_enabled" {
+  type        = bool
+  description = "Whether to mount the artifacts blob container on all runner instances using Blobfuse2 with managed identity."
+  default     = true
+}
+
+variable "artifacts_blobfuse_mount_path" {
+  type        = string
+  description = "Path where the artifacts blob container is mounted on runner instances."
+  default     = "/mnt/artifacts"
+}
+
+variable "artifacts_blobfuse_tmp_path" {
+  type        = string
+  description = "Local cache path used by Blobfuse2."
+  default     = "/mnt/blobfuse2tmp"
+}
+
+variable "artifacts_blobfuse_mount_read_only" {
+  type        = bool
+  description = "Whether to mount the artifacts blob container in read-only mode on runner instances."
+  default     = true
+}
