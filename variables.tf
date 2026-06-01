@@ -61,21 +61,23 @@ variable "nat_gateway_create" {
 
 variable "registries" {
   type = map(object({
-
+    storage_account_name = optional(string, null)
+    storage_account_create = optional(bool, true)
+    container_name = optional(string, "registry")
   }))
   default = {}
+  description = "List of registry storages to deploy. See [Registry module documentation](./modules/registry/README.md) for the description of attributes. "
 }
 
 variable "runners" {
   type = map(object({
-
     vm_name = optional(string, null)
-    vm_size = optional(string, null)
-    vm_disk_size_gb = optional(number, null)
+    vm_size = optional(string, "Standard_D4s_v5")
+    vm_disk_size_gb = optional(number, 50)
     vm_image_id = optional(string, null)
     vm_image_name = optional(string, null)
-    vm_init_instances = optional(number, null)
-    vm_admin_username = optional(string, null)
+    vm_init_instances = optional(number, 0)
+    vm_admin_username = optional(string, "azdo")
     vm_admin_password = optional(string, null)
     vm_admin_ssh_public_key = optional(string, null)
 
@@ -84,16 +86,18 @@ variable "runners" {
     dev_vm_disk_size_gb = optional(number, null)
     dev_vm_image_id = optional(string, null)
     dev_vm_image_name = optional(string, null)
-    dev_vm_count = optional(number, null)
+    dev_vm_count = optional(number, 0)
     dev_vm_admin_username = optional(string, null)
     dev_vm_admin_password = optional(string, null)
     dev_vm_admin_ssh_public_key = optional(string, null)
 
-    registries = map(object({
-      mount_path = optional(string, null) # /mnt/artifacts/each.key
-      blobfuse_cache_path = optional(string, null) # /var/cache/blobfuse2/
-      read_only = optional(bool, true)
-    }))
+    registry_storage_mounts = optional(map(object({
+      mount_path = optional(string)
+      cache_path = optional(string)
+      read_only = optional(bool)
+    })), {})
     devops_project_name = string
   }))
+  default = {}
+  description = "List of Runners to deploy. See [Runner module documentation](./modules/runner/README.md) for the description of attributes. "
 }

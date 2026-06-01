@@ -3,7 +3,7 @@ locals {
   resource_group_name         = var.resource_group_create ? azurerm_resource_group.resource_group[0].name : data.azurerm_resource_group.resource_group[0].name
   resource_group_location     = var.resource_group_create ? azurerm_resource_group.resource_group[0].location : data.azurerm_resource_group.resource_group[0].location
 
-  registry_runners = {for registry in keys(var.registries): registry => [for runner in keys(var.runners): runner if contains(keys(var.runners[runner].registries), registry)]}
+  registry_runners = {for registry in keys(var.registries): registry => [for runner in keys(var.runners): runner if contains(keys(var.runners[runner].registry_storage_mounts), registry)]}
 }
 
 resource "azurerm_resource_group" "resource_group" {
@@ -16,11 +16,11 @@ resource "azurerm_resource_group" "resource_group" {
 data "azurerm_resource_group" "resource_group" {
   count = var.resource_group_create ? 0 : 1
 
-  name = var.resource_group_name
+  name = local.resource_group_name_default
 }
 
 module "network" {
-  source = "modules/network"
+  source = "./modules/network"
 
   name                    = var.name
   resource_group_name     = local.resource_group_name
@@ -46,19 +46,21 @@ resource "azurerm_user_assigned_identity" "runner" {
 }
 
 module "registries" {
-  source = "modules/registry"
+  source = "./modules/registry"
 
   for_each = var.registries
 
-  storage_account_name    = each.key
   resource_group_name     = local.resource_group_name
   resource_group_location = local.resource_group_location
 
-  runner_principal_ids = [for runner in local.registry_runners[each.key] : azurerm_user_assigned_identity.runner[runner].id]
+  storage_account_name  = coalesce(each.value.storage_account_name, each.key)
+  container_name        = each.value.container_name
+
+  runner_principal_ids = {for runner in local.registry_runners[each.key] : runner => azurerm_user_assigned_identity.runner[runner].principal_id }
 }
 
 module "runners" {
-  source = "modules/runner"
+  source = "./modules/runner"
 
   for_each = var.runners
 
@@ -68,7 +70,8 @@ module "runners" {
 
   subnet_id = module.network.subnet_id
 
-  vm_identity_id = azurerm_user_assigned_identity.runner[each.key].id
+  vm_identity_name = "${var.name}-${each.key}-id"
+  vm_identity_create = false
 
   vm_name = each.value.vm_name
   vm_size = each.value.vm_size
@@ -91,18 +94,23 @@ module "runners" {
   dev_vm_admin_ssh_public_key = each.value.dev_vm_admin_ssh_public_key
 
   devops_project_name = each.value.devops_project_name
-  devops_runner_recycle_after_each_use = null
-  devops_runner_ttl_minutes = null
-  devops_runners_count_max = null
-  devops_runners_count_min = null
-  devops_runners_pool_name =  null
-  devops_service_endpoint_create = null
-  devops_service_endpoint_id = null
-  devops_service_endpoint_name = null
+  #devops_runner_recycle_after_each_use = null
+  #devops_runner_ttl_minutes = null
+  #devops_runners_count_max = null
+  #devops_runners_count_min = null
+  #devops_runners_pool_name =  null
+  #devops_service_endpoint_create = null
+  #devops_service_endpoint_id = null
+  #devops_service_endpoint_name = null
 
-  artifacts_storage_mount = {for registry, v in each.value.registries: module.registries[registry].storage_account_name => {
+  registry_storage_mounts = {for registry, v in each.value.registry_storage_mounts: module.registries[registry].storage_account_name => {
     mount_path = v.mount_path
-    blobfuse_cache_path = v.blobfuse_cache_path
+    cache_path = v.cache_path
     read_only = v.read_only
+    container_name = module.registries[registry].container_name
   }}
+
+  depends_on = [
+    azurerm_user_assigned_identity.runner
+  ]
 }

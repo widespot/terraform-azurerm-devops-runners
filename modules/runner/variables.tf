@@ -80,11 +80,6 @@ variable "vm_image_id" {
   default     = null
 }
 
-variable "dev_vms_count" {
-  type        = number
-  description = "The number of standalone development VMs to create for testing the image."
-  default     = 0
-}
 variable "dev_vm_name_prefix" {
   type        = string
   default     = null
@@ -94,6 +89,16 @@ variable "dev_vm_size" {
   type        = string
   default     = null
   description = "Size of the development VMs. Default is the value of `vm_size`"
+}
+variable "dev_vm_disk_size_gb" {
+  type        = number
+  default     = null
+  description = "Size for the primary disk of the dev VMs, in Gb"
+}
+variable "dev_vms_count" {
+  type        = number
+  description = "The number of standalone development VMs to create for testing the image."
+  default     = 0
 }
 variable "dev_vm_admin_username" {
   type        = string
@@ -105,30 +110,22 @@ variable "dev_vm_admin_password" {
   default     = null
   description = "The password for the administrator user. Default is `vm_admin_username`"
 }
-
 variable "dev_vm_admin_ssh_public_key" {
   type        = string
   default     = null
   description = "Public ssh key for the admin user on the dev machines. Default is `vm_admin_ssh_public_key`"
 }
-
 variable "dev_vm_image_id" {
   type        = string
   default     = null
   description = "Image id for the dev machine. When null, value is `vm_image_id`"
 }
-
 variable "dev_vm_image_name" {
   type        = string
   default     = null
   description = "The name of the custom image to use for the VMs. The image is expected to be in the same resource group."
 }
 
-variable "dev_vm_disk_size_gb" {
-  type        = number
-  default     = null
-  description = "Size for the primary disk of the dev VMs, in Gb"
-}
 
 variable "devops_project_name" {
   type        = string
@@ -186,11 +183,11 @@ variable "devops_runner_recycle_after_each_use" {
 variable "registry_storage_mounts" {
   # key = storage_account_name
   type        = map(object({
-    mount_path = optional(string, null) # /mnt/artifacts/each.key
-    cache_path = optional(string, null) # /var/cache/blobfuse2/
-    read_only = optional(bool, true)
-    container_name = string
+    mount_path      = optional(string, null)
+    cache_path      = optional(string, null)
+    read_only       = optional(bool, true)
+    container_name  = string
   }))
-  description = "The name of the storage account for artifacts. If null, it defaults to the `name` variable (sanitized)."
   default     = {}
+  description = "List of Storage Account container to mount in both the runner and dev VM instances. The name of the Storage account to use is the key of the entries in the map."
 }

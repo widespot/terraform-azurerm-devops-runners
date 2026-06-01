@@ -14,7 +14,7 @@ terraform {
 }
 
 module "runner" {
-  source = "../modules/simple"
+  source = "../../modules/simple"
 
   name = "tempo-runner"
   devops_project_name = var.devops_project_name
