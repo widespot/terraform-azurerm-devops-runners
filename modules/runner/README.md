@@ -4,14 +4,13 @@
 
 | Name | Version |
 | ---- | ------- |
-| <a name="requirement_azuredevops"></a> [azuredevops](#requirement\_azuredevops) | >= 1.0.0 |
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.49.0 |
 
 ### Providers
 
 | Name | Version |
 | ---- | ------- |
-| <a name="provider_azuredevops"></a> [azuredevops](#provider\_azuredevops) | >= 1.0.0 |
+| <a name="provider_azuread"></a> [azuread](#provider\_azuread) | n/a |
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.49.0 |
 | <a name="provider_terraform"></a> [terraform](#provider\_terraform) | n/a |
 
@@ -23,18 +22,23 @@ No modules.
 
 | Name | Type |
 | ---- | ---- |
-| [azuredevops_elastic_pool.runners_pool](https://registry.terraform.io/providers/microsoft/azuredevops/latest/docs/resources/elastic_pool) | resource |
-| [azuredevops_serviceendpoint_azurerm.service_endpoint](https://registry.terraform.io/providers/microsoft/azuredevops/latest/docs/resources/serviceendpoint_azurerm) | resource |
+| [azuread_application_federated_identity_credential.runner](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/application_federated_identity_credential) | resource |
+| [azuread_application_registration.runner](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/application_registration) | resource |
+| [azuread_service_principal.runner](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/service_principal) | resource |
 | [azurerm_linux_virtual_machine_scale_set.runner](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/linux_virtual_machine_scale_set) | resource |
 | [azurerm_network_interface.dev_network_interface](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/network_interface) | resource |
 | [azurerm_network_interface_security_group_association.dev_nsg_association](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/network_interface_security_group_association) | resource |
 | [azurerm_network_security_group.dev_nsg](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/network_security_group) | resource |
 | [azurerm_public_ip.dev_ip](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/public_ip) | resource |
+| [azurerm_role_assignment.azdo_vmss_discovery](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.azdo_vmss_operator](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.devops](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/role_assignment) | resource |
+| [azurerm_role_definition.azdo_vmss_discovery](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/role_definition) | resource |
+| [azurerm_role_definition.azdo_vmss_operator](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/role_definition) | resource |
 | [azurerm_user_assigned_identity.runner](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/user_assigned_identity) | resource |
 | [azurerm_virtual_machine.dev_vm](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/virtual_machine) | resource |
+| [azurerm_virtual_machine_scale_set_extension.extension](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/virtual_machine_scale_set_extension) | resource |
 | [terraform_data.cloud_init](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/resources/data) | resource |
-| [azuredevops_project.project](https://registry.terraform.io/providers/microsoft/azuredevops/latest/docs/data-sources/project) | data source |
-| [azuredevops_serviceendpoint_azurerm.service_endpoint](https://registry.terraform.io/providers/microsoft/azuredevops/latest/docs/data-sources/serviceendpoint_azurerm) | data source |
 | [azurerm_resource_group.resource_group](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/data-sources/resource_group) | data source |
 | [azurerm_subscription.subscription](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/data-sources/subscription) | data source |
 | [azurerm_user_assigned_identity.runner](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/data-sources/user_assigned_identity) | data source |
@@ -46,23 +50,19 @@ No modules.
 | <a name="input_dev_vm_admin_password"></a> [dev\_vm\_admin\_password](#input\_dev\_vm\_admin\_password) | The password for the administrator user. Default is `vm_admin_username` | `string` | `null` | no |
 | <a name="input_dev_vm_admin_ssh_public_key"></a> [dev\_vm\_admin\_ssh\_public\_key](#input\_dev\_vm\_admin\_ssh\_public\_key) | Public ssh key for the admin user on the dev machines. Default is `vm_admin_ssh_public_key` | `string` | `null` | no |
 | <a name="input_dev_vm_admin_username"></a> [dev\_vm\_admin\_username](#input\_dev\_vm\_admin\_username) | Admin username of the dev vms. Default is `vm_admin_username` | `string` | `null` | no |
-| <a name="input_dev_vm_disk_size_gb"></a> [dev\_vm\_disk\_size\_gb](#input\_dev\_vm\_disk\_size\_gb) | Size for the primary disk of the dev VMs, in Gb | `number` | `null` | no |
+| <a name="input_dev_vm_disk_size_gb"></a> [dev\_vm\_disk\_size\_gb](#input\_dev\_vm\_disk\_size\_gb) | Size for the primary disk of the dev VMs, in Gb. Default value is `vm_disk_size_gb` | `number` | `null` | no |
 | <a name="input_dev_vm_image_id"></a> [dev\_vm\_image\_id](#input\_dev\_vm\_image\_id) | Image id for the dev machine. When null, value is `vm_image_id` | `string` | `null` | no |
-| <a name="input_dev_vm_image_name"></a> [dev\_vm\_image\_name](#input\_dev\_vm\_image\_name) | The name of the custom image to use for the VMs. The image is expected to be in the same resource group. | `string` | `null` | no |
+| <a name="input_dev_vm_image_name"></a> [dev\_vm\_image\_name](#input\_dev\_vm\_image\_name) | The name of the custom image to use for the VMs. The image is expected to be in the same resource group. When null, value is `vm_image_name` | `string` | `null` | no |
 | <a name="input_dev_vm_name_prefix"></a> [dev\_vm\_name\_prefix](#input\_dev\_vm\_name\_prefix) | Prefix for the dev vm name | `string` | `null` | no |
 | <a name="input_dev_vm_size"></a> [dev\_vm\_size](#input\_dev\_vm\_size) | Size of the development VMs. Default is the value of `vm_size` | `string` | `null` | no |
 | <a name="input_dev_vms_count"></a> [dev\_vms\_count](#input\_dev\_vms\_count) | The number of standalone development VMs to create for testing the image. | `number` | `0` | no |
-| <a name="input_devops_project_name"></a> [devops\_project\_name](#input\_devops\_project\_name) | The name of the Azure DevOps project where the runner pool will be created. | `string` | n/a | yes |
-| <a name="input_devops_runner_recycle_after_each_use"></a> [devops\_runner\_recycle\_after\_each\_use](#input\_devops\_runner\_recycle\_after\_each\_use) | Whether Azure DevOps should tear down and recreate the VM after every job execution. | `bool` | `false` | no |
-| <a name="input_devops_runner_ttl_minutes"></a> [devops\_runner\_ttl\_minutes](#input\_devops\_runner\_ttl\_minutes) | The number of minutes to wait before deleting excess idle agents. | `number` | `15` | no |
-| <a name="input_devops_runners_count_max"></a> [devops\_runners\_count\_max](#input\_devops\_runners\_count\_max) | The maximum number of agents allowed in the elastic pool. | `number` | `2` | no |
-| <a name="input_devops_runners_count_min"></a> [devops\_runners\_count\_min](#input\_devops\_runners\_count\_min) | The minimum number of idle agents Azure DevOps should keep warm. | `number` | `0` | no |
-| <a name="input_devops_runners_pool_name"></a> [devops\_runners\_pool\_name](#input\_devops\_runners\_pool\_name) | The name of the Azure DevOps elastic agent pool. If null, it defaults to the `name` variable. | `string` | `null` | no |
-| <a name="input_devops_service_endpoint_create"></a> [devops\_service\_endpoint\_create](#input\_devops\_service\_endpoint\_create) | Whether to create a new AzureRM service connection in Azure DevOps. | `bool` | `true` | no |
-| <a name="input_devops_service_endpoint_id"></a> [devops\_service\_endpoint\_id](#input\_devops\_service\_endpoint\_id) | Id of the Azure DevOps Service endpoint to use. When not provided, the id is taken from either the existing or a newly created `devops_service_endpoint_name` Service Endpoint, based on the `devops_service_endpoint_create` variable. | `string` | `null` | no |
-| <a name="input_devops_service_endpoint_name"></a> [devops\_service\_endpoint\_name](#input\_devops\_service\_endpoint\_name) | The name of the AzureRM service connection to use. If null, it defaults to the `name` variable followed by `-endpoint`. | `string` | `null` | no |
+| <a name="input_devops_organization"></a> [devops\_organization](#input\_devops\_organization) | Name of the DevOps organization using the VM scale set. The value has no functional meaning and is only used to populate names and descriptions. The connection is only based on the `devops_token_issuer` and `devops_token_subject`. Required when `devops_token_subject` is used. | `string` | `null` | no |
+| <a name="input_devops_project_name"></a> [devops\_project\_name](#input\_devops\_project\_name) | Name of the DevOps project using the VM scale set. The value has no functional meaning and is only used to populate names and descriptions. The connection is only based on the `devops_token_issuer` and `devops_token_subject`. Required when `devops_token_subject` is used. | `string` | `null` | no |
+| <a name="input_devops_service_connection_id"></a> [devops\_service\_connection\_id](#input\_devops\_service\_connection\_id) | ID of the DevOps service connection driving the VM scale set. The value has no functional meaning and is only used to populate names and descriptions. The connection is only based on the `devops_token_issuer` and `devops_token_subject`. Required when `devops_token_subject` is used. | `string` | `null` | no |
+| <a name="input_devops_token_issuer"></a> [devops\_token\_issuer](#input\_devops\_token\_issuer) | Devops token issuer allowed to drive the VM scale set. Required when `devops_token_subject` is used. | `string` | `null` | no |
+| <a name="input_devops_token_subject"></a> [devops\_token\_subject](#input\_devops\_token\_subject) | Devops token subject allowed to drive the VM scale set. Required when `devops_token_issuer` is used. | `string` | `null` | no |
 | <a name="input_name"></a> [name](#input\_name) | Base name for the runner pool and associated resources. | `string` | n/a | yes |
-| <a name="input_registry_storage_mounts"></a> [registry\_storage\_mounts](#input\_registry\_storage\_mounts) | The name of the storage account for artifacts. If null, it defaults to the `name` variable (sanitized). | <pre>map(object({<br/>    mount_path = optional(string, null) # /mnt/artifacts/each.key<br/>    cache_path = optional(string, null) # /var/cache/blobfuse2/<br/>    read_only = optional(bool, true)<br/>    container_name = string<br/>  }))</pre> | `{}` | no |
+| <a name="input_registry_storage_mounts"></a> [registry\_storage\_mounts](#input\_registry\_storage\_mounts) | List of Storage Account container to mount in both the runner and dev VM instances. The name of the Storage account to use is the key of the entries in the map. | <pre>map(object({<br/>    mount_path     = optional(string, null)<br/>    cache_path     = optional(string, null)<br/>    read_only      = optional(bool, true)<br/>    container_name = string<br/>  }))</pre> | `{}` | no |
 | <a name="input_resource_group_location"></a> [resource\_group\_location](#input\_resource\_group\_location) | The location of the resource group use. If not provided, the location is dynamically loaded thanks to a data block | `string` | `null` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | The name of the resource group to use | `string` | n/a | yes |
 | <a name="input_subnet_id"></a> [subnet\_id](#input\_subnet\_id) | Subnet where to deploy all the runners | `string` | n/a | yes |
@@ -81,7 +81,9 @@ No modules.
 
 ### Outputs
 
-No outputs.
+| Name | Description |
+| ---- | ----------- |
+| <a name="output_vmss_id"></a> [vmss\_id](#output\_vmss\_id) | n/a |
 <!-- END_TF_DOCS -->
 
 ### Generate this documentation

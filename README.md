@@ -3,11 +3,13 @@
 > Build and deploy a DevOps runners on Azure using Terraform in 10 minutes
 
 ## Features
-* [x] One line automated deployment, including Azure DevOps configuration
-* [x] Multiple runners
+* [x] One line automated deployment
+* [x] Multiple runners, 
 * [x] 100% configurable and modular
 * [x] Deploy additional "dev" VM instances to test the runner image
-* [x] Upload artifact on Azure Storage account, and mount it on the runners as additional volumes
+* [x] mount shared blob storage on the runners as additional volumes
+* [x] Upload artifact on the azure Storage account
+* [x] Include automated or guided Azure DevOps configuration
 * [x] Support for the creation of custom runner VM image (see [Option 2 of Usage section](#option-2-custom-runner-image-with-packer)
 
 ## Usage

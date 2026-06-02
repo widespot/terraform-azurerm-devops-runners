@@ -157,42 +157,58 @@ variable "dev_vm_admin_ssh_public_key" {
 }
 
 
+variable "devops_organization" {
+  type    = string
+  default = null
+}
 variable "devops_project_name" {
-  type        = string
-  description = "The name of the Azure DevOps project where the runner pool will be created."
+  type    = string
+  default = null
+}
+variable "devops_service_connection_id" {
+  type    = string
+  default = null
+}
+variable "devops_token_issuer" {
+  type    = string
+  default = null
+}
+variable "devops_token_subject" {
+  type    = string
+  default = null
 }
 
-variable "devops_service_endpoint_create" {
+variable "devops_service_connection_create" {
   type        = bool
-  description = "Whether to create a new AzureRM service connection in Azure DevOps."
+  description = "Whether to create a new connection to Azure Cloud services in Azure DevOps."
   default     = true
 }
 
-variable "devops_service_endpoint_name" {
+variable "devops_runner_pool_create" {
+  type        = bool
+  description = "Whether to declare the Elastic pool of runner in Azure DevOps"
+  default     = true
+}
+
+variable "devops_service_connection_name" {
   type        = string
   default     = null
   description = "The name of the AzureRM service connection to use. If null, it defaults to the `name` variable followed by `-endpoint`."
 }
 
-variable "devops_service_endpoint_id" {
-  type        = string
-  description = "Id of the Azure DevOps Service endpoint to use. When not provided, the id is taken from either the existing or a newly created `devops_service_endpoint_name` Service Endpoint, based on the `devops_service_endpoint_create` variable."
-  default     = null
-}
-
-variable "devops_runners_pool_name" {
+variable "devops_runner_pool_name" {
   type        = string
   description = "The name of the Azure DevOps elastic agent pool. If null, it defaults to the `name` variable."
   default     = null
 }
 
-variable "devops_runners_count_min" {
+variable "devops_runner_pool_size_min" {
   type        = number
   description = "The minimum number of idle agents Azure DevOps should keep warm."
   default     = 0
 }
 
-variable "devops_runners_count_max" {
+variable "devops_runner_pool_size_max" {
   type        = number
   description = "The maximum number of agents allowed in the elastic pool."
   default     = 2

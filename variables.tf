@@ -96,8 +96,37 @@ variable "runners" {
       cache_path = optional(string)
       read_only = optional(bool)
     })), {})
-    devops_project_name = string
+
+    devops_project_name = optional(string)
+    devops_organization = optional(string)
+    devops_service_connection_id = optional(string)
+    devops_token_issuer = optional(string)
+    devops_token_subject = optional(string)
   }))
   default = {}
   description = "List of Runners to deploy. See [Runner module documentation](./modules/runner/README.md) for the description of attributes. "
+}
+
+variable "devops_registrations" {
+  description = "List of registrations in devops. The key of the map must match a key in of the `runners` map for the registration to work. See [Devops module documentation](./modules/devops) for the description of attributes."
+  type        = map(object({
+
+    project_id = optional(string)
+    project_name = optional(string)
+
+    service_connection_create = optional(bool, true)
+    service_connection_name = optional(string, null)
+    service_connection_id = optional(string, null)
+
+    runner_pool_create = optional(bool, true)
+    runner_pool_name = optional(string, null)
+
+    runner_pool_size_min = optional(number, 0)
+    runner_pool_size_max = optional(number, 2)
+
+    runner_ttl_minutes = optional(number, 15)
+
+    runner_recycle_after_each_use = optional(bool, false)
+  }))
+  default     = {}
 }

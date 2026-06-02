@@ -101,15 +101,11 @@ module "runner" {
   dev_vm_image_name = var.dev_vm_image_name
   dev_vm_size = var.dev_vm_size
 
-  devops_project_name = var.devops_project_name
-  devops_runner_recycle_after_each_use = var.devops_runner_recycle_after_each_use
-  devops_runner_ttl_minutes = var.devops_runner_ttl_minutes
-  devops_runners_count_max = var.devops_runners_count_max
-  devops_runners_count_min = var.devops_runners_count_min
-  devops_runners_pool_name =  var.devops_runners_pool_name
-  devops_service_endpoint_create = var.devops_service_endpoint_create
-  devops_service_endpoint_id = var.devops_service_endpoint_id
-  devops_service_endpoint_name = var.devops_service_endpoint_name
+  devops_organization = var.devops_organization
+  devops_project = var.devops_project_name
+  devops_service_connection_id = var.devops_service_connection_id
+  devops_token_issuer = var.devops_token_issuer
+  devops_token_subject = var.devops_token_subject
 
   registry_storage_mounts = var.registry_storage_account_create && var.registry_mount_enabled ? {(module.registry[0].storage_account_name) = {
     mount_path          = var.registry_mount_path
@@ -121,4 +117,31 @@ module "runner" {
   depends_on = [
     azurerm_user_assigned_identity.runner
   ]
+}
+
+module "devops" {
+  source              = "../devops"
+
+  count = var.devops_service_connection_create || var.devops_runner_pool_create ? 1 : 0
+
+  name                    = var.name
+
+  #project_id = var.
+  project_name = var.devops_project_name
+  azure_vmss_id = module.runner.vmss_id
+
+  service_connection_create = var.devops_service_connection_create
+  service_connection_id = var.devops_service_connection_id
+  service_connection_name = var.devops_service_connection_name
+  service_connection_tenant_id = data.azurerm_subscription.subscription.tenant_id
+  service_connection_subscription_id = data.azurerm_subscription.subscription.subscription_id
+  service_connection_subscription_name = data.azurerm_subscription.subscription.display_name
+  service_connection_resource_group = local.resource_group_name
+
+  runner_pool_create = var.devops_runner_pool_create
+  runner_pool_name = var.devops_runner_pool_name
+  runner_pool_size_max = var.devops_runner_pool_size_max
+  runner_pool_size_min = var.devops_runner_pool_size_min
+  runner_recycle_after_each_use = var.devops_runner_recycle_after_each_use
+  runner_ttl_minutes = var.devops_runner_ttl_minutes
 }
