@@ -90,3 +90,27 @@ resource "azurerm_linux_virtual_machine_scale_set" "runner" {
     ]
   }
 }
+
+resource "azurerm_virtual_machine_scale_set_extension" "extension" {
+  count = local.vm_image_id == null ? 0 : 1
+
+  name                         = "Microsoft.Azure.DevOps.Pipelines.Agent"
+  virtual_machine_scale_set_id = azurerm_linux_virtual_machine_scale_set.runner[0].id
+  publisher                    = "Microsoft.VisualStudio.Services"
+  type                         = "TeamServicesAgentLinux"
+  type_handler_version         = "1.26"
+  # curl -s https://api.github.com/repos/microsoft/azure-pipelines-agent/releases/latest \
+  #  | jq -r '.tag_name | ltrimstr("v")'
+  settings = jsonencode({
+    agentDownloadUrl        = "https://download.agent.dev.azure.com/agent/4.272.0/vsts-agent-linux-x64-4.272.0.tar.gz"
+    agentFolder             = "/agent"
+    enableScriptDownloadUrl = "https://vstsagenttools.blob.core.windows.net/tools/ElasticPools/Linux/17/enableagent.sh"
+    isPipelinesAgent        = true
+  })
+  auto_upgrade_minor_version = false
+  automatic_upgrade_enabled = false
+  provision_after_extensions = []
+}
+
+data "azurerm_subscription" "subscription" {
+}

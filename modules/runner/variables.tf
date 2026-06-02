@@ -126,58 +126,25 @@ variable "dev_vm_image_name" {
   description = "The name of the custom image to use for the VMs. The image is expected to be in the same resource group."
 }
 
-
-variable "devops_project_name" {
-  type        = string
-  description = "The name of the Azure DevOps project where the runner pool will be created."
+variable "devops_organization" {
+  type = string
+  default = null
 }
-
-variable "devops_service_endpoint_create" {
-  type        = bool
-  description = "Whether to create a new AzureRM service connection in Azure DevOps."
-  default     = true
+variable "devops_project" {
+  type = string
+  default = null
 }
-
-variable "devops_service_endpoint_name" {
-  type        = string
-  default     = null
-  description = "The name of the AzureRM service connection to use. If null, it defaults to the `name` variable followed by `-endpoint`."
+variable "devops_service_connection_id" {
+  type = string
+  default = null
 }
-
-variable "devops_service_endpoint_id" {
-  type        = string
-  description = "Id of the Azure DevOps Service endpoint to use. When not provided, the id is taken from either the existing or a newly created `devops_service_endpoint_name` Service Endpoint, based on the `devops_service_endpoint_create` variable."
-  default     = null
+variable "devops_token_issuer" {
+  type = string
+  default = null
 }
-
-variable "devops_runners_pool_name" {
-  type        = string
-  description = "The name of the Azure DevOps elastic agent pool. If null, it defaults to the `name` variable."
-  default     = null
-}
-
-variable "devops_runners_count_min" {
-  type        = number
-  description = "The minimum number of idle agents Azure DevOps should keep warm."
-  default     = 0
-}
-
-variable "devops_runners_count_max" {
-  type        = number
-  description = "The maximum number of agents allowed in the elastic pool."
-  default     = 2
-}
-
-variable "devops_runner_ttl_minutes" {
-  type        = number
-  description = "The number of minutes to wait before deleting excess idle agents."
-  default     = 15
-}
-
-variable "devops_runner_recycle_after_each_use" {
-  type        = bool
-  description = "Whether Azure DevOps should tear down and recreate the VM after every job execution."
-  default     = false
+variable "devops_token_subject" {
+  type = string
+  default = null
 }
 
 variable "registry_storage_mounts" {

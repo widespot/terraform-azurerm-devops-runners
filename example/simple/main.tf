@@ -23,7 +23,7 @@ module "runner" {
   vm_admin_ssh_public_key = file("~/.ssh/id_rsa.pub")
   vm_admin_password = "Password1!"
 
-  dev_vms_count = 1
+  #dev_vms_count = 1
   vm_size = "Standard_D8s_v5"
   dev_vm_image_id = "/subscriptions/083e56a7-a090-4ad2-b62f-13b7e69fc648/resourceGroups/tempo-runner-rg/providers/Microsoft.Compute/images/tempo-runner-vmimg8"
 
