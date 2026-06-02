@@ -50,6 +50,11 @@ module "full" {
       devops_project_name = var.devops_project_name
     }
   }
+  devops_registrations = {
+    tempo-internal = {
+      project_name = var.devops_project_name
+    }
+  }
 }
 
 variable "devops_project_name" {

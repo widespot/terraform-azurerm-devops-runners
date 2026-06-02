@@ -93,7 +93,7 @@ variable "dev_vm_size" {
 variable "dev_vm_disk_size_gb" {
   type        = number
   default     = null
-  description = "Size for the primary disk of the dev VMs, in Gb"
+  description = "Size for the primary disk of the dev VMs, in Gb. Default value is `vm_disk_size_gb`"
 }
 variable "dev_vms_count" {
   type        = number
@@ -123,37 +123,42 @@ variable "dev_vm_image_id" {
 variable "dev_vm_image_name" {
   type        = string
   default     = null
-  description = "The name of the custom image to use for the VMs. The image is expected to be in the same resource group."
+  description = "The name of the custom image to use for the VMs. The image is expected to be in the same resource group. When null, value is `vm_image_name`"
 }
 
 variable "devops_organization" {
-  type = string
-  default = null
+  type        = string
+  default     = null
+  description = "Name of the DevOps organization using the VM scale set. The value has no functional meaning and is only used to populate names and descriptions. The connection is only based on the `devops_token_issuer` and `devops_token_subject`. Required when `devops_token_subject` is used."
 }
-variable "devops_project" {
-  type = string
-  default = null
+variable "devops_project_name" {
+  type        = string
+  default     = null
+  description = "Name of the DevOps project using the VM scale set. The value has no functional meaning and is only used to populate names and descriptions. The connection is only based on the `devops_token_issuer` and `devops_token_subject`. Required when `devops_token_subject` is used."
 }
 variable "devops_service_connection_id" {
-  type = string
-  default = null
+  type        = string
+  default     = null
+  description = "ID of the DevOps service connection driving the VM scale set. The value has no functional meaning and is only used to populate names and descriptions. The connection is only based on the `devops_token_issuer` and `devops_token_subject`. Required when `devops_token_subject` is used."
 }
 variable "devops_token_issuer" {
-  type = string
-  default = null
+  type        = string
+  default     = null
+  description = "Devops token issuer allowed to drive the VM scale set. Required when `devops_token_subject` is used."
 }
 variable "devops_token_subject" {
-  type = string
-  default = null
+  type        = string
+  default     = null
+  description = "Devops token subject allowed to drive the VM scale set. Required when `devops_token_issuer` is used."
 }
 
 variable "registry_storage_mounts" {
   # key = storage_account_name
-  type        = map(object({
-    mount_path      = optional(string, null)
-    cache_path      = optional(string, null)
-    read_only       = optional(bool, true)
-    container_name  = string
+  type = map(object({
+    mount_path     = optional(string, null)
+    cache_path     = optional(string, null)
+    read_only      = optional(bool, true)
+    container_name = string
   }))
   default     = {}
   description = "List of Storage Account container to mount in both the runner and dev VM instances. The name of the Storage account to use is the key of the entries in the map."

@@ -5,7 +5,7 @@ locals {
 resource "azuread_application_registration" "runner" {
   count = local.devops_manual_registration ? 1 : 0
 
-  display_name = "${var.devops_organization}-${var.devops_project}-${var.devops_service_connection_id}"
+  display_name = "${var.devops_organization}-${var.devops_project_name}-${var.devops_service_connection_id}"
   # When importing the one created by AzDo, this value is set to 0. But 0 is not allowed when creating from Terraform :(
   requested_access_token_version = 1
   sign_in_audience = "AzureADMyOrg"
@@ -17,7 +17,7 @@ resource "azuread_application_federated_identity_credential" "runner" {
 
   application_id = azuread_application_registration.runner[0].id
   display_name   = var.devops_service_connection_id
-  description    = "Federation for Service Connection ${var.name} in https://dev.azure.com/${var.devops_organization}/${var.devops_project}/_settings/adminservices?resourceId=${var.devops_service_connection_id}"
+  description    = "Federation for Service Connection ${var.name} in https://dev.azure.com/${var.devops_organization}/${var.devops_project_name}/_settings/adminservices?resourceId=${var.devops_service_connection_id}"
   audiences      = ["api://AzureADTokenExchange"]
   issuer         = var.devops_token_issuer
   subject        = var.devops_token_subject

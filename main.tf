@@ -93,15 +93,11 @@ module "runners" {
   dev_vm_admin_password = each.value.dev_vm_admin_password
   dev_vm_admin_ssh_public_key = each.value.dev_vm_admin_ssh_public_key
 
+  devops_organization = each.value.devops_organization
   devops_project_name = each.value.devops_project_name
-  #devops_runner_recycle_after_each_use = null
-  #devops_runner_ttl_minutes = null
-  #devops_runners_count_max = null
-  #devops_runners_count_min = null
-  #devops_runners_pool_name =  null
-  #devops_service_endpoint_create = null
-  #devops_service_endpoint_id = null
-  #devops_service_endpoint_name = null
+  devops_service_connection_id = each.value.devops_service_connection_id
+  devops_token_issuer = each.value.devops_token_issuer
+  devops_token_subject = each.value.devops_token_subject
 
   registry_storage_mounts = {for registry, v in each.value.registry_storage_mounts: module.registries[registry].storage_account_name => {
     mount_path = v.mount_path
@@ -113,4 +109,35 @@ module "runners" {
   depends_on = [
     azurerm_user_assigned_identity.runner
   ]
+}
+
+module "devops" {
+  source = "./modules/devops"
+
+  for_each = var.devops_registrations
+
+  name   = each.key
+
+  project_id = each.value.project_id
+  project_name = each.value.project_name
+
+  azure_vmss_id = module.runners[each.key].vmss_id
+
+  service_connection_create = each.value.service_connection_create
+  service_connection_name = each.value.service_connection_name
+  service_connection_id = each.value.service_connection_id
+  service_connection_tenant_id = module.runners[each.key].tenant_id
+  service_connection_subscription_id = module.runners[each.key].subscription_id
+  service_connection_subscription_name = module.runners[each.key].subscription_name
+  service_connection_resource_group = local.resource_group_name
+
+  runner_pool_create = each.value.runner_pool_create
+  runner_pool_name = each.value.runner_pool_name
+
+  runner_pool_size_min = each.value.runner_pool_size_min
+  runner_pool_size_max = each.value.runner_pool_size_max
+
+  runner_ttl_minutes = each.value.runner_ttl_minutes
+
+  runner_recycle_after_each_use = each.value.runner_recycle_after_each_use
 }
