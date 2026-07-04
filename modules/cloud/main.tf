@@ -50,14 +50,15 @@ resource "azurerm_user_assigned_identity" "runner" {
 module "registry" {
   source = "../registry"
 
-  count = var.registry_mount_enabled ? 1 : 0
-
-  storage_account_name    = coalesce(var.registry_storage_account_name, replace(lower("${var.name}artifacts"), "/[^a-z0-9]/", ""))
   storage_account_create  = var.registry_storage_account_create
-  resource_group_name     = local.resource_group_name
-  resource_group_location = local.resource_group_location
+  storage_account_name    = coalesce(var.registry_storage_account_name, replace(lower("${var.name}artifacts"), "/[^a-z0-9]/", ""))
+  storage_account_id      = var.registry_storage_account_id
+  container_create        = var.registry_container_create
+  container_name          = var.registry_container_name
+  container_id            = var.registry_container_id
 
-  container_name = var.registry_container_name
+  resource_group_name     = coalesce(var.registry_resource_group_name, local.resource_group_name)
+  resource_group_location = coalesche(var.registry_resource_group_location, local.resource_group_location)
 
   runner_identity_access = {
     runner = {

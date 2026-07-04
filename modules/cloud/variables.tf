@@ -185,18 +185,40 @@ variable "devops_agent_enable_script_version" {
   default = "17"
 }
 
+variable "registry_resource_group_name" {
+  type = string
+  default = null
+}
+variable "registry_resource_group_location" {
+  type = string
+  default = null
+}
 variable "registry_storage_account_create" {
   type        = bool
-  description = "Whether to create the artifact storage account and container."
+  description = "Whether to create the artifact storage account."
   default     = true
 }
-
 variable "registry_storage_account_name" {
   type        = string
   description = "The name of the storage account for artifacts. If null, it defaults to the `name` variable (sanitized)."
   default     = null
 }
+variable "registry_storage_account_id" {
+  type        = string
+  description = "The id of the storage account for artifacts."
+  default     = null
+}
 
+variable "registry_container_create" {
+  type        = bool
+  description = "Whether to create the artifact storage container within the storage account."
+  default     = true
+}
+variable "registry_container_id" {
+  type        = string
+  description = "Id of the container to use for registry"
+  default     = null
+}
 variable "registry_container_name" {
   type        = string
   description = "The name of the storage container for artifacts."
