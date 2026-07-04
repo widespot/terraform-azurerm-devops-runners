@@ -29,6 +29,11 @@ variable "runner_identity_access" {
   description = "Map of runner key to User Managed Identity of the runners VM allowed to read the artifacts"
 }
 
+variable "container_create" {
+  type = bool
+  default = true
+}
+
 variable "container_name" {
   type        = string
   description = "The name of the storage container for artifacts."

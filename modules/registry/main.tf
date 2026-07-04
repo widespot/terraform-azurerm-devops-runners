@@ -35,10 +35,10 @@ data "azurerm_storage_account" "registry" {
 }
 
 resource "azurerm_storage_container" "artifacts" {
-  count = var.storage_account_create ? 1 : 0
+  count = var.container_create ? 1 : 0
 
   name                  = var.container_name
-  storage_account_id    = azurerm_storage_account.artifacts[0].id
+  storage_account_id    = var.storage_account_create ? azurerm_storage_account.artifacts[0].id : data.azurerm_storage_account.registry[0].id
   container_access_type = "private"
 }
 
