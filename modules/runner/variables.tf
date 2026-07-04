@@ -126,6 +126,15 @@ variable "dev_vm_image_name" {
   description = "The name of the custom image to use for the VMs. The image is expected to be in the same resource group. When null, value is `vm_image_name`"
 }
 
+variable "devops_agent_version" {
+  type = string
+  default = "4.273.0"
+  description = "Version of the DevOps agent to install via a scale set extension on the instances. Url is https://download.agent.dev.azure.com/agent/$${devops_agent_version}/vsts-agent-linux-x64-$${devops_agent_version}.tar.gz"
+}
+variable "devops_agent_enable_script_version" {
+  type = string
+  default = "17"
+}
 variable "devops_organization" {
   type        = string
   default     = null

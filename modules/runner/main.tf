@@ -102,9 +102,9 @@ resource "azurerm_virtual_machine_scale_set_extension" "extension" {
   # curl -s https://api.github.com/repos/microsoft/azure-pipelines-agent/releases/latest \
   #  | jq -r '.tag_name | ltrimstr("v")'
   settings = jsonencode({
-    agentDownloadUrl        = "https://download.agent.dev.azure.com/agent/4.272.0/vsts-agent-linux-x64-4.272.0.tar.gz"
+    agentDownloadUrl        = "https://download.agent.dev.azure.com/agent/${var.devops_agent_version}/vsts-agent-linux-x64-${var.devops_agent_version}.tar.gz"
     agentFolder             = "/agent"
-    enableScriptDownloadUrl = "https://vstsagenttools.blob.core.windows.net/tools/ElasticPools/Linux/17/enableagent.sh"
+    enableScriptDownloadUrl = "https://vstsagenttools.blob.core.windows.net/tools/ElasticPools/Linux/${var.devops_agent_enable_script_version}/enableagent.sh"
     isPipelinesAgent        = true
   })
   auto_upgrade_minor_version = false

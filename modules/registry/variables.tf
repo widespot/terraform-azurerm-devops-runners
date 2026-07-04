@@ -20,8 +20,12 @@ variable "resource_group_location" {
   description = "The location of the resource group use. If not provided, the location is dynamically loaded thanks to a data block"
 }
 
-variable "runner_principal_ids" {
-  type        = map(string)
+variable "runner_identity_access" {
+  type        = map(object({
+    principal_id = string
+    read_only    = optional(bool, true)
+  }))
+  default     = {}
   description = "Map of runner key to User Managed Identity of the runners VM allowed to read the artifacts"
 }
 

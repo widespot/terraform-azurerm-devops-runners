@@ -177,6 +177,14 @@ variable "devops_token_subject" {
   type    = string
   default = null
 }
+variable "devops_agent_version" {
+  type = string
+  default = "4.273.0"
+}
+variable "devops_agent_enable_script_version" {
+  type = string
+  default = "17"
+}
 
 variable "devops_service_connection_create" {
   type        = bool

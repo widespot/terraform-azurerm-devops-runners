@@ -51,15 +51,21 @@ resource "azurerm_user_assigned_identity" "runner" {
 module "registry" {
   source = "../registry"
 
-  count = var.registry_storage_account_create ? 1 : 0
+  count = var.registry_mount_enabled ? 1 : 0
 
   storage_account_name    = coalesce(var.registry_storage_account_name, replace(lower("${var.name}artifacts"), "/[^a-z0-9]/", ""))
+  storage_account_create  = var.registry_storage_account_create
   resource_group_name     = local.resource_group_name
   resource_group_location = local.resource_group_location
 
   container_name = var.registry_container_name
 
-  runner_principal_ids           = { runner = local.vm_identity_principal_id }
+  runner_identity_access = {
+    runner = {
+      principal_id = local.vm_identity_principal_id,
+      read_only = var.registry_mount_read_only,
+    }
+  }
 
   depends_on = [
     azurerm_user_assigned_identity.runner
@@ -102,12 +108,14 @@ module "runner" {
   dev_vm_size = var.dev_vm_size
 
   devops_organization = var.devops_organization
-  devops_project = var.devops_project_name
+  devops_project_name = var.devops_project_name
   devops_service_connection_id = var.devops_service_connection_id
   devops_token_issuer = var.devops_token_issuer
   devops_token_subject = var.devops_token_subject
+  devops_agent_version = var.devops_agent_version
+  devops_agent_enable_script_version = var.devops_agent_enable_script_version
 
-  registry_storage_mounts = var.registry_storage_account_create && var.registry_mount_enabled ? {(module.registry[0].storage_account_name) = {
+  registry_storage_mounts = var.registry_mount_enabled ? {(module.registry[0].storage_account_name) = {
     mount_path          = var.registry_mount_path
     cache_path          = var.registry_mount_cache_path
     read_only           = var.registry_mount_read_only

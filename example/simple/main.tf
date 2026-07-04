@@ -19,19 +19,29 @@ module "runner" {
   name = "tempo-runner"
   devops_project_name = var.devops_project_name
 
-  vm_image_name = "tempo-runner-vmimg3"
+  vm_image_name = "tempo-runner-vmimg8"
   vm_admin_ssh_public_key = file("~/.ssh/id_rsa.pub")
   vm_admin_password = "Password1!"
+  vm_disk_size_gb = 150
 
-  #dev_vms_count = 1
+  registry_storage_account_create = false
+  registry_storage_account_name = "runnerartifacts"
+  registry_mount_read_only = false
+  registry_container_name = "dist"
+  registry_mount_enabled = true
+  registry_mount_path = "/mnt/dist"
+
+  devops_agent_version = "5.275.0"
+  devops_agent_enable_script_version = "18"
+
+  dev_vms_count = 1
   vm_size = "Standard_D8s_v5"
-  dev_vm_image_id = "/subscriptions/083e56a7-a090-4ad2-b62f-13b7e69fc648/resourceGroups/tempo-runner-rg/providers/Microsoft.Compute/images/tempo-runner-vmimg8"
 
-  artifacts = {
-    repo = {
-      source = "test-artifact.txt"
-    }
-  }
+  #artifacts = {
+  #  repo = {
+  #    source = "test-artifact.txt"
+  #  }
+  #}
 }
 
 variable "devops_project_name" {
