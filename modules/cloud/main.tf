@@ -58,7 +58,7 @@ module "registry" {
   container_id            = var.registry_container_id
 
   resource_group_name     = coalesce(var.registry_resource_group_name, local.resource_group_name)
-  resource_group_location = coalesche(var.registry_resource_group_location, local.resource_group_location)
+  resource_group_location = coalesce(var.registry_resource_group_location, local.resource_group_location)
 
   runner_identity_access = {
     runner = {
