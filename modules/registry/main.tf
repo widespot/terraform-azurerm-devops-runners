@@ -3,17 +3,23 @@ locals {
   requires_container_id = length(var.artifacts) > 0
 
   storage_account_create = var.storage_account_create && var.storage_account_id == null && var.container_id == null
-  storage_account_load = !var.storage_account_create && var.storage_account_id == null && local.requires_storage_account_id
+  storage_account_load = local.requires_storage_account_id && !local.storage_account_create
   storage_account_id = (var.storage_account_id != null ? var.storage_account_id :
-        local.storage_account_create ? azurerm_storage_account.artifacts[0].id :
-          local.storage_account_load ? data.azurerm_storage_account.artifacts[0].id :
-              null)
+      local.storage_account_create ? azurerm_storage_account.artifacts[0].id :
+        local.storage_account_load ? data.azurerm_storage_account.artifacts[0].id :
+        null)
+  storage_account_name = (var.storage_account_name != null ? var.storage_account_name :
+      local.storage_account_create ? azurerm_storage_account.artifacts[0].name :
+        local.storage_account_load ? data.azurerm_storage_account.artifacts[0].name : null)
 
   container_create = var.container_create && var.container_id == null
   container_load = !var.container_create && var.container_id == null && local.requires_container_id
   container_id = (var.container_id != null ? var.container_id :
-        local.container_create ? azurerm_storage_container.artifacts[0].id:
+      local.container_create ? azurerm_storage_container.artifacts[0].id:
         local.container_load ? data.azurerm_storage_container.artifacts[0].id : null)
+  container_name = (var.container_name != null ? var.container_name :
+      local.container_create ? azurerm_storage_container.artifacts[0].name:
+        local.container_load ? data.azurerm_storage_container.artifacts[0].name : null)
 
   resource_group_name     = var.resource_group_name
   resource_group_location = var.resource_group_location != null ? var.resource_group_location : data.azurerm_resource_group.resource_group[0].location

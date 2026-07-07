@@ -51,7 +51,7 @@ module "registry" {
   source = "../registry"
 
   storage_account_create  = var.registry_storage_account_create
-  storage_account_name    = coalesce(var.registry_storage_account_name, replace(lower("${var.name}artifacts"), "/[^a-z0-9]/", ""))
+  storage_account_name    = var.registry_storage_account_name
   storage_account_id      = var.registry_storage_account_id
   container_create        = var.registry_container_create
   container_name          = var.registry_container_name
