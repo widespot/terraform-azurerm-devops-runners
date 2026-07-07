@@ -11,6 +11,9 @@ resource "azuread_application_registration" "runner" {
   sign_in_audience = "AzureADMyOrg"
   notes = "Managed by Terraform"
 }
+output "devops_app_registration_client_id" {
+  value = local.devops_manual_registration ? azuread_application_registration.runner.client_id : null
+}
 
 resource "azuread_application_federated_identity_credential" "runner" {
   count = local.devops_manual_registration ? 1 : 0

@@ -115,11 +115,11 @@ module "runner" {
   devops_agent_version = var.devops_agent_version
   devops_agent_enable_script_version = var.devops_agent_enable_script_version
 
-  registry_storage_mounts = var.registry_mount_enabled ? {(module.registry[0].storage_account_name) = {
+  registry_storage_mounts = var.registry_mount_enabled ? {(module.registry.storage_account_name) = {
     mount_path          = var.registry_mount_path
     cache_path          = var.registry_mount_cache_path
     read_only           = var.registry_mount_read_only
-    container_name      = module.registry[0].container_name
+    container_name      = module.registry.container_name
   }} : {}
 
   depends_on = [

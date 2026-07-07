@@ -12,3 +12,7 @@ output "artifacts_mount_path" {
   value = var.registry_storage_account_create && var.registry_mount_enabled ? var.registry_mount_path : null
 }
 
+output "devops_app_registration_client_id" {
+  value = module.runner.devops_app_registration_client_id
+}
+
