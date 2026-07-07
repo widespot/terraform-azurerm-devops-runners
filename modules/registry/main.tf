@@ -1,21 +1,19 @@
 locals {
   requires_storage_account_id = length(var.runner_identity_access) > 0 || local.container_create
-  requires_container_id = length(var.artifacts)
+  requires_container_id = length(var.artifacts) > 0
 
   storage_account_create = var.storage_account_create && var.storage_account_id == null && var.container_id == null
   storage_account_load = !var.storage_account_create && var.storage_account_id == null && local.requires_storage_account_id
-  storage_account_id = !local.requires_storage_account_id ? null :
-      var.storage_account_id != null ? var.storage_account_id :
+  storage_account_id = (var.storage_account_id != null ? var.storage_account_id :
         local.storage_account_create ? azurerm_storage_account.artifacts[0].id :
           local.storage_account_load ? data.azurerm_storage_account.artifacts[0].id :
-              null
+              null)
 
   container_create = var.container_create && var.container_id == null
-  container_load = !var.container_create && var_container_id == null && local.requires_container_id
-  container_id = !local.requires_container_id ? null :
-      var.container_id != null ? var.container_id :
+  container_load = !var.container_create && var.container_id == null && local.requires_container_id
+  container_id = (var.container_id != null ? var.container_id :
         local.container_create ? azurerm_storage_container.artifacts[0].id:
-        container_load ? data.azurerm_storage_container.artifacts[0].id : null
+        local.container_load ? data.azurerm_storage_container.artifacts[0].id : null)
 
   resource_group_name     = var.resource_group_name
   resource_group_location = var.resource_group_location != null ? var.resource_group_location : data.azurerm_resource_group.resource_group[0].location
@@ -42,7 +40,7 @@ resource "azurerm_storage_account" "artifacts" {
 }
 
 data "azurerm_storage_account" "artifacts" {
-  count = local.storage_account_load ? 0 : 1
+  count = local.storage_account_load ? 1 : 0
 
   name                = var.storage_account_name
   resource_group_name = local.resource_group_name
