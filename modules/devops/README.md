@@ -1,20 +1,71 @@
-# Register a VM Scale Set as an Elastic runner pool in AzureDevOps
+# Azure DevOps Elastic Runner Pool Module
 
-For using this module, both the AzureRM provider and the Azure DevOps provider must be poiting at the same tenant,
-and the account used to run Terraform must have the necessary permissions to:
-* create Azure DevOps project resources
-* **and** have Contributor role on the Azure subscription or Resource group where the VM Scale Set is deployed
+This module registers and manages Azure Virtual Machine Scale Sets (VMSS) as Elastic Runner Pools within Azure DevOps projects.
 
-> **SECURITY WARNING** about Azure DevOps auto registration in Azure Cloud
-> 
-> Under the hood, when creating an automatic Service Connection from Azure DevOps to Azure Cloud,
-> Azure DevOps will leverage the permission of the user executing the command to create App Registrations, Identities and Roles assignments in Azure Cloud so that
-> Azure DevOps can do much more than just driving a single VM Scale Set. It indeed end up being assigned to a Contributor role on the whole subscription 
-> (or limited to the `resource_group` if provided).
-> 
-> We therefore strongly recommend not to use Azure DevOps auto registration in production environments (both from terraform and the web portal).
+It provisions the `azuredevops_elastic_pool` resource to enable dynamic agent scaling driven by pipeline demand, and manages or connects to AzureRM Service Endpoints using Workload Identity Federation so Azure DevOps can interact with Azure compute resources.
 
+## Features
 
+* **Elastic Runner Pool Management**: Creates and configures Azure DevOps Elastic Agent Pools linked directly to Azure VM Scale Sets with customizable min/max capacity, idle agent TTL, and agent recycling policies (`recycle_after_each_use`).
+* **Workload Identity Federation Service Connections**: Creates AzureRM service endpoints with `WorkloadIdentityFederation` or integrates with existing service connection endpoints.
+* **Automated VMSS Replacement Trigger**: Integrates lifecycle triggers (`replace_triggered_by`) on VMSS ID changes to ensure the Azure DevOps agent extension settings remain correctly initialized when VMSS configurations are updated.
+* **Flexible Project & Subscription Scoping**: Supports targeting Azure DevOps projects by name or ID, and scoping AzureRM service connections at the subscription or resource group level.
+
+## Security Considerations
+
+> **SECURITY NOTE**: When creating an automatic AzureRM Service Connection from Azure DevOps to Azure, Azure DevOps creates App Registrations, Service Principals, and Role Assignments that may grant broad permissions (such as `Contributor` on the subscription or resource group).
+>
+> To maintain least privilege in production, combine this module with the `runner` module's Workload Identity Federation configuration (`devops_token_issuer` and `devops_token_subject`), which generates custom, narrowly scoped RBAC roles (`AzDO VMSS Discovery` and `AzDO VMSS Operator`) restricted solely to the runner VM scale set.
+
+## Usage Examples
+
+### Creating an Elastic Pool with a New Service Connection
+
+```hcl
+module "devops_runner_pool" {
+  source = "./modules/devops"
+
+  name         = "build-runners"
+  project_name = "MyDevOpsProject"
+
+  azure_vmss_id = module.runner.vmss_id
+
+  # Service Connection Configuration
+  service_connection_create         = true
+  service_connection_name           = "build-runners-azure-sc"
+  service_connection_resource_group = "runners-rg"
+
+  # Elastic Pool Scaling Settings
+  runner_pool_size_min          = 1
+  runner_pool_size_max          = 5
+  runner_ttl_minutes            = 30
+  runner_recycle_after_each_use = true
+}
+```
+
+### Using an Existing Azure DevOps Service Connection
+
+```hcl
+module "devops_runner_pool" {
+  source = "./modules/devops"
+
+  name       = "deploy-runners"
+  project_id = "00000000-0000-0000-0000-000000000000"
+
+  azure_vmss_id = module.runner.vmss_id
+
+  # Reference existing Service Connection
+  service_connection_create = false
+  service_connection_id     = "11111111-2222-3333-4444-555555555555"
+
+  # Elastic Pool Scaling Settings
+  runner_pool_name              = "Production-Deploy-Pool"
+  runner_pool_size_min          = 0
+  runner_pool_size_max          = 10
+  runner_ttl_minutes            = 15
+  runner_recycle_after_each_use = false
+}
+```
 
 ## Documentation
 <!-- BEGIN_TF_DOCS -->
