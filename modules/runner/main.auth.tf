@@ -12,7 +12,7 @@ resource "azuread_application_registration" "runner" {
   notes = "Managed by Terraform"
 }
 output "devops_app_registration_client_id" {
-  value = local.devops_manual_registration ? azuread_application_registration.runner.client_id : null
+  value = local.devops_manual_registration ? azuread_application_registration.runner[0].client_id : null
 }
 
 resource "azuread_application_federated_identity_credential" "runner" {
