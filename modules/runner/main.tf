@@ -25,12 +25,20 @@ resource "azurerm_user_assigned_identity" "runner" {
   location            = local.resource_group_location
   resource_group_name = local.resource_group_name
 }
-
 data "azurerm_user_assigned_identity" "runner" {
   count = var.vm_identity_id == null && !var.vm_identity_create ? 1 : 0
 
   name                = local.vm_identity_default_name
   resource_group_name = local.resource_group_name
+}
+output "vm_identity_name" {
+  value = (var.vm_identity_id == null && var.vm_identity_create) ? azurerm_user_assigned_identity.runner[0].name : data.azurerm_user_assigned_identity.runner[0].name
+}
+output "vm_identity_id" {
+  value = (var.vm_identity_id == null && var.vm_identity_create) ? azurerm_user_assigned_identity.runner[0].id : data.azurerm_user_assigned_identity.runner[0].id
+}
+output "vm_identity_principal_id" {
+  value = (var.vm_identity_id == null && var.vm_identity_create) ? azurerm_user_assigned_identity.runner[0].principal_id : data.azurerm_user_assigned_identity.runner[0].principal_id
 }
 
 resource "azurerm_linux_virtual_machine_scale_set" "runner" {
@@ -102,9 +110,9 @@ resource "azurerm_virtual_machine_scale_set_extension" "extension" {
   # curl -s https://api.github.com/repos/microsoft/azure-pipelines-agent/releases/latest \
   #  | jq -r '.tag_name | ltrimstr("v")'
   settings = jsonencode({
-    agentDownloadUrl        = "https://download.agent.dev.azure.com/agent/4.272.0/vsts-agent-linux-x64-4.272.0.tar.gz"
+    agentDownloadUrl        = "https://download.agent.dev.azure.com/agent/${var.devops_agent_version}/vsts-agent-linux-x64-${var.devops_agent_version}.tar.gz"
     agentFolder             = "/agent"
-    enableScriptDownloadUrl = "https://vstsagenttools.blob.core.windows.net/tools/ElasticPools/Linux/17/enableagent.sh"
+    enableScriptDownloadUrl = "https://vstsagenttools.blob.core.windows.net/tools/ElasticPools/Linux/${var.devops_agent_enable_script_version}/enableagent.sh"
     isPipelinesAgent        = true
   })
   auto_upgrade_minor_version = false

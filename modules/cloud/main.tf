@@ -4,7 +4,6 @@ locals {
   resource_group_location     = var.resource_group_create ? azurerm_resource_group.resource_group[0].location : data.azurerm_resource_group.resource_group[0].location
 
   vm_identity_name = coalesce(var.vm_identity_name, "${var.name}-id")
-  vm_identity_id = azurerm_user_assigned_identity.runner.id
   vm_identity_principal_id = azurerm_user_assigned_identity.runner.principal_id
 }
 
@@ -51,14 +50,15 @@ resource "azurerm_user_assigned_identity" "runner" {
 module "registry" {
   source = "../registry"
 
-  count = var.registry_mount_enabled ? 1 : 0
-
-  storage_account_name    = coalesce(var.registry_storage_account_name, replace(lower("${var.name}artifacts"), "/[^a-z0-9]/", ""))
   storage_account_create  = var.registry_storage_account_create
-  resource_group_name     = local.resource_group_name
-  resource_group_location = local.resource_group_location
+  storage_account_name    = var.registry_storage_account_name
+  storage_account_id      = var.registry_storage_account_id
+  container_create        = var.registry_container_create
+  container_name          = var.registry_container_name
+  container_id            = var.registry_container_id
 
-  container_name = var.registry_container_name
+  resource_group_name     = coalesce(var.registry_resource_group_name, local.resource_group_name)
+  resource_group_location = coalesce(var.registry_resource_group_location, local.resource_group_location)
 
   runner_identity_access = {
     runner = {
@@ -115,41 +115,14 @@ module "runner" {
   devops_agent_version = var.devops_agent_version
   devops_agent_enable_script_version = var.devops_agent_enable_script_version
 
-  registry_storage_mounts = var.registry_mount_enabled ? {(module.registry[0].storage_account_name) = {
+  registry_storage_mounts = var.registry_mount_enabled ? {(module.registry.storage_account_name) = {
     mount_path          = var.registry_mount_path
     cache_path          = var.registry_mount_cache_path
     read_only           = var.registry_mount_read_only
-    container_name      = module.registry[0].container_name
+    container_name      = module.registry.container_name
   }} : {}
 
   depends_on = [
     azurerm_user_assigned_identity.runner
   ]
-}
-
-module "devops" {
-  source              = "../devops"
-
-  count = var.devops_service_connection_create || var.devops_runner_pool_create ? 1 : 0
-
-  name                    = var.name
-
-  #project_id = var.
-  project_name = var.devops_project_name
-  azure_vmss_id = module.runner.vmss_id
-
-  service_connection_create = var.devops_service_connection_create
-  service_connection_id = var.devops_service_connection_id
-  service_connection_name = var.devops_service_connection_name
-  service_connection_tenant_id = data.azurerm_subscription.subscription.tenant_id
-  service_connection_subscription_id = data.azurerm_subscription.subscription.subscription_id
-  service_connection_subscription_name = data.azurerm_subscription.subscription.display_name
-  service_connection_resource_group = local.resource_group_name
-
-  runner_pool_create = var.devops_runner_pool_create
-  runner_pool_name = var.devops_runner_pool_name
-  runner_pool_size_max = var.devops_runner_pool_size_max
-  runner_pool_size_min = var.devops_runner_pool_size_min
-  runner_recycle_after_each_use = var.devops_runner_recycle_after_each_use
-  runner_ttl_minutes = var.devops_runner_ttl_minutes
 }

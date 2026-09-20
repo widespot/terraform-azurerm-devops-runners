@@ -1,17 +1,86 @@
+# Azure DevOps Runner Scale Set Module
+
+This module deploys and configures the core compute infrastructure for self-hosted Azure DevOps Elastic Runner Pools on Azure.
+
+It provisions a Linux Virtual Machine Scale Set (VMSS) with the Azure Pipelines Agent extension, manages VM identities, mounts optional shared Azure Blob storage containers using Blobfuse2, and provisions optional standalone development VMs for testing and debugging runner images. Additionally, it supports fine-grained Workload Identity Federation (OIDC) between Azure DevOps and Azure to operate the runner VMSS under the principle of least privilege.
+
+## Features
+
+* **Azure DevOps VM Scale Set**: Provisions a Linux VMSS integrated with the `Microsoft.Azure.DevOps.Pipelines.Agent` extension to enable automatic scaling and orchestration by Azure DevOps Elastic Pools.
+* **Workload Identity Federation & Least-Privilege RBAC**: When provided with Azure DevOps token federation details (`devops_token_issuer` and `devops_token_subject`), provisions an Azure AD Application, Federated Identity Credential, and custom RBAC role definitions (`AzDO VMSS Discovery` and `AzDO VMSS Operator`) scoped strictly to the scale set rather than granting subscription-wide Contributor permissions.
+* **Shared Storage Mounting via Blobfuse2**: Automatically generates cloud-init configurations to mount Azure Storage Blob containers across runner instances and dev VMs in read-only or read-write mode.
+* **Standalone Development VMs**: Optional standalone VM instances with public IPs and Network Security Groups (allowing SSH and VNC access) to test, inspect, or troubleshoot runner images before deploying to the scale set.
+* **Managed Identity Support**: Creates or links a User-Assigned Managed Identity used by the scale set instances to access Azure resources (such as storage accounts).
+
+## Usage Examples
+
+### Basic Runner Pool
+
+```hcl
+module "runner" {
+  source = "./modules/runner"
+
+  name                = "build-runner"
+  resource_group_name = "runners-rg"
+  subnet_id           = module.network.subnet_id
+
+  vm_image_name       = "custom-ubuntu-runner-2024"
+  vm_size             = "Standard_D4s_v5"
+  vm_admin_username   = "azdo"
+  vm_admin_ssh_public_key = file("~/.ssh/id_rsa.pub")
+}
+```
+
+### Runner Pool with Workload Identity Federation & Storage Mounts
+
+```hcl
+module "runner" {
+  source = "./modules/runner"
+
+  name                = "prod-runner"
+  resource_group_name = "runners-rg"
+  subnet_id           = module.network.subnet_id
+
+  vm_image_name       = "custom-ubuntu-runner-2024"
+  vm_size             = "Standard_D8s_v5"
+  vm_admin_username   = "azdo"
+  vm_admin_ssh_public_key = file("~/.ssh/id_rsa.pub")
+
+  # Azure DevOps Workload Identity Federation
+  devops_organization          = "my-azdo-org"
+  devops_project_name          = "my-project"
+  devops_service_connection_id = "00000000-0000-0000-0000-000000000000"
+  devops_token_issuer          = "https://vststoken.dev.azure.com/00000000-0000-0000-0000-000000000000"
+  devops_token_subject         = "sc://my-azdo-org/my-project/my-service-connection"
+
+  # Shared storage mount
+  registry_storage_mounts = {
+    "artifacts_storage" = {
+      container_name = "cache"
+      mount_path     = "/mnt/cache"
+      read_only      = true
+    }
+  }
+
+  # Optional Dev VM for interactive image debugging
+  dev_vms_count = 1
+}
+```
+
 ## Documentation
 <!-- BEGIN_TF_DOCS -->
 ### Requirements
 
 | Name | Version |
 | ---- | ------- |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.49.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 4.49 |
 
 ### Providers
 
 | Name | Version |
 | ---- | ------- |
 | <a name="provider_azuread"></a> [azuread](#provider\_azuread) | n/a |
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.49.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | ~> 4.49 |
 | <a name="provider_terraform"></a> [terraform](#provider\_terraform) | n/a |
 
 ### Modules
@@ -25,23 +94,23 @@ No modules.
 | [azuread_application_federated_identity_credential.runner](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/application_federated_identity_credential) | resource |
 | [azuread_application_registration.runner](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/application_registration) | resource |
 | [azuread_service_principal.runner](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/service_principal) | resource |
-| [azurerm_linux_virtual_machine_scale_set.runner](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/linux_virtual_machine_scale_set) | resource |
-| [azurerm_network_interface.dev_network_interface](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/network_interface) | resource |
-| [azurerm_network_interface_security_group_association.dev_nsg_association](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/network_interface_security_group_association) | resource |
-| [azurerm_network_security_group.dev_nsg](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/network_security_group) | resource |
-| [azurerm_public_ip.dev_ip](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/public_ip) | resource |
-| [azurerm_role_assignment.azdo_vmss_discovery](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/role_assignment) | resource |
-| [azurerm_role_assignment.azdo_vmss_operator](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/role_assignment) | resource |
-| [azurerm_role_assignment.devops](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/role_assignment) | resource |
-| [azurerm_role_definition.azdo_vmss_discovery](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/role_definition) | resource |
-| [azurerm_role_definition.azdo_vmss_operator](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/role_definition) | resource |
-| [azurerm_user_assigned_identity.runner](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/user_assigned_identity) | resource |
-| [azurerm_virtual_machine.dev_vm](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/virtual_machine) | resource |
-| [azurerm_virtual_machine_scale_set_extension.extension](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/virtual_machine_scale_set_extension) | resource |
+| [azurerm_linux_virtual_machine_scale_set.runner](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/linux_virtual_machine_scale_set) | resource |
+| [azurerm_network_interface.dev_network_interface](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface) | resource |
+| [azurerm_network_interface_security_group_association.dev_nsg_association](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface_security_group_association) | resource |
+| [azurerm_network_security_group.dev_nsg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
+| [azurerm_public_ip.dev_ip](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
+| [azurerm_role_assignment.azdo_vmss_discovery](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.azdo_vmss_operator](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.devops](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_definition.azdo_vmss_discovery](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_definition) | resource |
+| [azurerm_role_definition.azdo_vmss_operator](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_definition) | resource |
+| [azurerm_user_assigned_identity.runner](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
+| [azurerm_virtual_machine.dev_vm](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine) | resource |
+| [azurerm_virtual_machine_scale_set_extension.extension](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_scale_set_extension) | resource |
 | [terraform_data.cloud_init](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/resources/data) | resource |
-| [azurerm_resource_group.resource_group](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/data-sources/resource_group) | data source |
-| [azurerm_subscription.subscription](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/data-sources/subscription) | data source |
-| [azurerm_user_assigned_identity.runner](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/data-sources/user_assigned_identity) | data source |
+| [azurerm_resource_group.resource_group](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) | data source |
+| [azurerm_subscription.subscription](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subscription) | data source |
+| [azurerm_user_assigned_identity.runner](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/user_assigned_identity) | data source |
 
 ### Inputs
 
@@ -56,6 +125,8 @@ No modules.
 | <a name="input_dev_vm_name_prefix"></a> [dev\_vm\_name\_prefix](#input\_dev\_vm\_name\_prefix) | Prefix for the dev vm name | `string` | `null` | no |
 | <a name="input_dev_vm_size"></a> [dev\_vm\_size](#input\_dev\_vm\_size) | Size of the development VMs. Default is the value of `vm_size` | `string` | `null` | no |
 | <a name="input_dev_vms_count"></a> [dev\_vms\_count](#input\_dev\_vms\_count) | The number of standalone development VMs to create for testing the image. | `number` | `0` | no |
+| <a name="input_devops_agent_enable_script_version"></a> [devops\_agent\_enable\_script\_version](#input\_devops\_agent\_enable\_script\_version) | n/a | `string` | `"17"` | no |
+| <a name="input_devops_agent_version"></a> [devops\_agent\_version](#input\_devops\_agent\_version) | Version of the DevOps agent to install via a scale set extension on the instances. Url is https://download.agent.dev.azure.com/agent/${devops_agent_version}/vsts-agent-linux-x64-${devops_agent_version}.tar.gz | `string` | `"4.273.0"` | no |
 | <a name="input_devops_organization"></a> [devops\_organization](#input\_devops\_organization) | Name of the DevOps organization using the VM scale set. The value has no functional meaning and is only used to populate names and descriptions. The connection is only based on the `devops_token_issuer` and `devops_token_subject`. Required when `devops_token_subject` is used. | `string` | `null` | no |
 | <a name="input_devops_project_name"></a> [devops\_project\_name](#input\_devops\_project\_name) | Name of the DevOps project using the VM scale set. The value has no functional meaning and is only used to populate names and descriptions. The connection is only based on the `devops_token_issuer` and `devops_token_subject`. Required when `devops_token_subject` is used. | `string` | `null` | no |
 | <a name="input_devops_service_connection_id"></a> [devops\_service\_connection\_id](#input\_devops\_service\_connection\_id) | ID of the DevOps service connection driving the VM scale set. The value has no functional meaning and is only used to populate names and descriptions. The connection is only based on the `devops_token_issuer` and `devops_token_subject`. Required when `devops_token_subject` is used. | `string` | `null` | no |
@@ -83,6 +154,13 @@ No modules.
 
 | Name | Description |
 | ---- | ----------- |
+| <a name="output_devops_app_registration_client_id"></a> [devops\_app\_registration\_client\_id](#output\_devops\_app\_registration\_client\_id) | n/a |
+| <a name="output_subscription_id"></a> [subscription\_id](#output\_subscription\_id) | n/a |
+| <a name="output_subscription_name"></a> [subscription\_name](#output\_subscription\_name) | n/a |
+| <a name="output_tenant_id"></a> [tenant\_id](#output\_tenant\_id) | n/a |
+| <a name="output_vm_identity_id"></a> [vm\_identity\_id](#output\_vm\_identity\_id) | n/a |
+| <a name="output_vm_identity_name"></a> [vm\_identity\_name](#output\_vm\_identity\_name) | n/a |
+| <a name="output_vm_identity_principal_id"></a> [vm\_identity\_principal\_id](#output\_vm\_identity\_principal\_id) | n/a |
 | <a name="output_vmss_id"></a> [vmss\_id](#output\_vmss\_id) | n/a |
 <!-- END_TF_DOCS -->
 

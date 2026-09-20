@@ -1,12 +1,16 @@
 variable "storage_account_name" {
   type        = string
   description = "The name of the storage account for artifacts. If null, it defaults to the `name` variable (sanitized)."
+  default     = null
 }
-
 variable "storage_account_create" {
   type        = bool
   description = "Whether to create the artifact storage account and container."
   default     = true
+}
+variable "storage_account_id" {
+  type        = string
+  default     = null
 }
 
 variable "resource_group_name" {
@@ -20,15 +24,29 @@ variable "resource_group_location" {
   description = "The location of the resource group use. If not provided, the location is dynamically loaded thanks to a data block"
 }
 
-variable "runner_principal_ids" {
-  type        = map(string)
+variable "runner_identity_access" {
+  type        = map(object({
+    principal_id = string
+    read_only    = optional(bool, true)
+  }))
+  default     = {}
   description = "Map of runner key to User Managed Identity of the runners VM allowed to read the artifacts"
 }
 
+variable "container_create" {
+  type        = bool
+  description = "Whether container should be created or not. This value is ignored if `container_id` is provided"
+  default     = true
+}
 variable "container_name" {
   type        = string
   description = "The name of the storage container for artifacts."
   default     = "artifacts"
+}
+variable "container_id" {
+  type        = string
+  description = "Id of an existing container"
+  default     = null
 }
 
 variable "artifacts" {

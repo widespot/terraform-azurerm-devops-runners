@@ -2,9 +2,6 @@
 package_update: true
 bootcmd:
   - mkdir -p /etc/blobfuse2
-packages:
-  - fuse3
-  - libfuse3-dev
 write_files:
 %{ for storage_account, registry_storage_mount in registry_storage_mounts ~}
   - path: /etc/blobfuse2/${storage_account}.yaml
@@ -34,9 +31,15 @@ write_files:
 %{ endfor ~}
 runcmd:
   - bash -lc '. /etc/os-release; curl -fsSL "https://packages.microsoft.com/config/debian/$VERSION_ID/packages-microsoft-prod.deb" -o /tmp/packages-microsoft-prod.deb'
-  - dpkg -i /tmp/packages-microsoft-prod.deb
-  - apt-get update
-  - apt-get install -y blobfuse2
+  - |
+    echo "==== Adding windows packages list ..."
+    apt-get -o DPkg::Lock::Timeout=60 install -y /tmp/packages-microsoft-prod.deb
+  - |
+    echo "==== apt update ..."
+    apt-get -o DPkg::Lock::Timeout=60 update
+  - |
+    echo "==== apt install ..."
+    apt-get -o DPkg::Lock::Timeout=60 install -y blobfuse2 fuse3 libfuse3-dev
 %{ for storage_account, registry_storage_mount in registry_storage_mounts ~}
   - mkdir -p ${registry_storage_mount.cache_path}
   - mkdir -p ${registry_storage_mount.mount_path}

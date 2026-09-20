@@ -56,7 +56,12 @@ module "registries" {
   storage_account_name  = coalesce(each.value.storage_account_name, each.key)
   container_name        = each.value.container_name
 
-  runner_principal_ids = {for runner in local.registry_runners[each.key] : runner => azurerm_user_assigned_identity.runner[runner].principal_id }
+  runner_identity_access = {for runner in local.registry_runners[each.key] : runner =>
+    {
+      principal_id = azurerm_user_assigned_identity.runner[runner].principal_id,
+      read_only = var.runners[runner].registry_storage_mounts[each.key].read_only,
+    }
+  }
 }
 
 module "runners" {

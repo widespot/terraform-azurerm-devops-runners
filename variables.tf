@@ -94,7 +94,7 @@ variable "runners" {
     registry_storage_mounts = optional(map(object({
       mount_path = optional(string)
       cache_path = optional(string)
-      read_only = optional(bool)
+      read_only = optional(bool, true)
     })), {})
 
     devops_project_name = optional(string)
