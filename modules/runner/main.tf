@@ -106,7 +106,7 @@ resource "azurerm_virtual_machine_scale_set_extension" "extension" {
   virtual_machine_scale_set_id = azurerm_linux_virtual_machine_scale_set.runner[0].id
   publisher                    = "Microsoft.VisualStudio.Services"
   type                         = "TeamServicesAgentLinux"
-  type_handler_version         = "1.26"
+  type_handler_version         = var.devops_handler_version
   # curl -s https://api.github.com/repos/microsoft/azure-pipelines-agent/releases/latest \
   #  | jq -r '.tag_name | ltrimstr("v")'
   settings = jsonencode({

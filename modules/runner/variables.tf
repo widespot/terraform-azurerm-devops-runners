@@ -131,6 +131,11 @@ variable "devops_agent_version" {
   default = "4.273.0"
   description = "Version of the DevOps agent to install via a scale set extension on the instances. Url is https://download.agent.dev.azure.com/agent/$${devops_agent_version}/vsts-agent-linux-x64-$${devops_agent_version}.tar.gz"
 }
+variable "devops_handler_version" {
+  type        = string
+  default     = "1.26"
+  description = "Version of the Devops agent handler used by the scale set extension."
+}
 variable "devops_agent_enable_script_version" {
   type = string
   default = "17"
