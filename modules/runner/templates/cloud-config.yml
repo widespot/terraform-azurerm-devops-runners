@@ -14,12 +14,16 @@ write_files:
         level: log_warning
       components:
         - libfuse
+        - block_cache
         - attr_cache
         - azstorage
       libfuse:
         attribute-expiration-sec: 120
         entry-expiration-sec: 120
         negative-entry-expiration-sec: 120
+      block_cache:
+        block-size-mb: 16
+        parallelism: 16
       attr_cache:
         timeout-sec: 120
       azstorage:
