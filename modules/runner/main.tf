@@ -4,6 +4,8 @@ locals {
 
   vm_identity_default_name = coalesce(var.vm_identity_name, "${var.name}-id")
   vm_identity_id           = var.vm_identity_id != null ? var.vm_identity_id : var.vm_identity_create ? azurerm_user_assigned_identity.runner[0].id: data.azurerm_user_assigned_identity.runner[0].id
+  vm_identity_name         = var.vm_identity_id != null ? split("/", var.vm_identity_id)[8] : local.vm_identity_default_name
+  vm_identity_create       = var.vm_identity_id == null && var.vm_identity_create
 
   vm_image_id      = var.vm_image_id != null ? var.vm_image_id : (var.vm_image_name == null ? null : "/subscriptions/${data.azurerm_subscription.subscription.subscription_id}/resourceGroups/${local.resource_group_name}/providers/Microsoft.Compute/images/${var.vm_image_name}")
   vm_name          = coalesce(var.vm_name, "${var.name}-vm")
@@ -19,26 +21,26 @@ data "azurerm_resource_group" "resource_group" {
 }
 
 resource "azurerm_user_assigned_identity" "runner" {
-  count = var.vm_identity_id == null && var.vm_identity_create ? 1 : 0
+  count = local.vm_identity_create ? 1 : 0
 
-  name                = local.vm_identity_default_name
+  name                = local.vm_identity_name
   location            = local.resource_group_location
   resource_group_name = local.resource_group_name
 }
 data "azurerm_user_assigned_identity" "runner" {
-  count = var.vm_identity_id == null && !var.vm_identity_create ? 1 : 0
+  count = local.vm_identity_create ? 0 : 1
 
-  name                = local.vm_identity_default_name
+  name                = local.vm_identity_name
   resource_group_name = local.resource_group_name
 }
 output "vm_identity_name" {
-  value = (var.vm_identity_id == null && var.vm_identity_create) ? azurerm_user_assigned_identity.runner[0].name : data.azurerm_user_assigned_identity.runner[0].name
+  value = local.vm_identity_name
 }
 output "vm_identity_id" {
-  value = (var.vm_identity_id == null && var.vm_identity_create) ? azurerm_user_assigned_identity.runner[0].id : data.azurerm_user_assigned_identity.runner[0].id
+  value = local.vm_identity_create ? azurerm_user_assigned_identity.runner[0].id : data.azurerm_user_assigned_identity.runner[0].id
 }
 output "vm_identity_principal_id" {
-  value = (var.vm_identity_id == null && var.vm_identity_create) ? azurerm_user_assigned_identity.runner[0].principal_id : data.azurerm_user_assigned_identity.runner[0].principal_id
+  value = local.vm_identity_create ? azurerm_user_assigned_identity.runner[0].principal_id : data.azurerm_user_assigned_identity.runner[0].principal_id
 }
 
 resource "azurerm_linux_virtual_machine_scale_set" "runner" {
