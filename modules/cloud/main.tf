@@ -125,6 +125,7 @@ module "runner" {
   devops_token_subject = var.devops_token_subject
   devops_agent_version = var.devops_agent_version
   devops_agent_enable_script_version = var.devops_agent_enable_script_version
+  devops_handler_version = var.devops_handler_version
 
   registry_storage_mounts = var.registry_mount_enabled ? {(module.registry.storage_account_name) = {
     mount_path          = var.registry_mount_path
