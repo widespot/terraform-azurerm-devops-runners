@@ -155,14 +155,28 @@ No modules.
 
 | Name | Description |
 | ---- | ----------- |
-| <a name="output_devops_app_registration_client_id"></a> [devops\_app\_registration\_client\_id](#output\_devops\_app\_registration\_client\_id) | n/a |
-| <a name="output_subscription_id"></a> [subscription\_id](#output\_subscription\_id) | n/a |
-| <a name="output_subscription_name"></a> [subscription\_name](#output\_subscription\_name) | n/a |
-| <a name="output_tenant_id"></a> [tenant\_id](#output\_tenant\_id) | n/a |
-| <a name="output_vm_identity_id"></a> [vm\_identity\_id](#output\_vm\_identity\_id) | n/a |
-| <a name="output_vm_identity_name"></a> [vm\_identity\_name](#output\_vm\_identity\_name) | n/a |
-| <a name="output_vm_identity_principal_id"></a> [vm\_identity\_principal\_id](#output\_vm\_identity\_principal\_id) | n/a |
-| <a name="output_vmss_id"></a> [vmss\_id](#output\_vmss\_id) | n/a |
+| <a name="output_azdo_vmss_discovery_role_definition_id"></a> [azdo\_vmss\_discovery\_role\_definition\_id](#output\_azdo\_vmss\_discovery\_role\_definition\_id) | The Resource ID of the custom AzDO VMSS Discovery role definition, if created; null otherwise. |
+| <a name="output_azdo_vmss_operator_role_definition_id"></a> [azdo\_vmss\_operator\_role\_definition\_id](#output\_azdo\_vmss\_operator\_role\_definition\_id) | The Resource ID of the custom AzDO VMSS Operator role definition, if created; null otherwise. |
+| <a name="output_dev_vm_ids"></a> [dev\_vm\_ids](#output\_dev\_vm\_ids) | List of resource IDs of the standalone development VMs. |
+| <a name="output_dev_vm_names"></a> [dev\_vm\_names](#output\_dev\_vm\_names) | List of names of the standalone development VMs. |
+| <a name="output_dev_vm_network_security_group_id"></a> [dev\_vm\_network\_security\_group\_id](#output\_dev\_vm\_network\_security\_group\_id) | The ID of the Network Security Group associated with development VMs, if created; null otherwise. |
+| <a name="output_dev_vm_private_ips"></a> [dev\_vm\_private\_ips](#output\_dev\_vm\_private\_ips) | List of private IP addresses assigned to the standalone development VMs. |
+| <a name="output_dev_vm_public_ips"></a> [dev\_vm\_public\_ips](#output\_dev\_vm\_public\_ips) | List of public IP addresses assigned to the standalone development VMs. |
+| <a name="output_devops_app_registration_client_id"></a> [devops\_app\_registration\_client\_id](#output\_devops\_app\_registration\_client\_id) | The Application (client) ID of the Azure AD Application registration created for Azure DevOps OIDC integration, if enabled; null otherwise. |
+| <a name="output_devops_app_registration_object_id"></a> [devops\_app\_registration\_object\_id](#output\_devops\_app\_registration\_object\_id) | The Object ID of the Azure AD Application registration created for Azure DevOps OIDC integration, if enabled; null otherwise. |
+| <a name="output_devops_service_principal_id"></a> [devops\_service\_principal\_id](#output\_devops\_service\_principal\_id) | The Object ID of the Azure AD Service Principal created for Azure DevOps OIDC integration, if enabled; null otherwise. |
+| <a name="output_resource_group_location"></a> [resource\_group\_location](#output\_resource\_group\_location) | The location of the resource group. |
+| <a name="output_resource_group_name"></a> [resource\_group\_name](#output\_resource\_group\_name) | The name of the resource group. |
+| <a name="output_subscription_id"></a> [subscription\_id](#output\_subscription\_id) | The Azure subscription ID. |
+| <a name="output_subscription_name"></a> [subscription\_name](#output\_subscription\_name) | The display name of the Azure subscription. |
+| <a name="output_tenant_id"></a> [tenant\_id](#output\_tenant\_id) | The Azure tenant ID of the subscription. |
+| <a name="output_vm_identity_client_id"></a> [vm\_identity\_client\_id](#output\_vm\_identity\_client\_id) | The Client ID of the User Assigned Identity if created or looked up; null if an explicit vm\_identity\_id was provided. |
+| <a name="output_vm_identity_id"></a> [vm\_identity\_id](#output\_vm\_identity\_id) | The ID of the User Assigned Identity used by the runner instances. |
+| <a name="output_vm_identity_name"></a> [vm\_identity\_name](#output\_vm\_identity\_name) | The name of the User Assigned Identity used by the runner instances if created or looked up; null if an explicit vm\_identity\_id was provided. |
+| <a name="output_vm_identity_principal_id"></a> [vm\_identity\_principal\_id](#output\_vm\_identity\_principal\_id) | The Principal ID (object ID) of the User Assigned Identity if created or looked up; null if an explicit vm\_identity\_id was provided. |
+| <a name="output_vmss_id"></a> [vmss\_id](#output\_vmss\_id) | The ID of the Linux Virtual Machine Scale Set for runners if created; null otherwise. |
+| <a name="output_vmss_name"></a> [vmss\_name](#output\_vmss\_name) | The name of the Linux Virtual Machine Scale Set for runners if created; null otherwise. |
+| <a name="output_vmss_unique_id"></a> [vmss\_unique\_id](#output\_vmss\_unique\_id) | The unique ID of the Linux Virtual Machine Scale Set for runners if created; null otherwise. |
 <!-- END_TF_DOCS -->
 
 ### Generate this documentation
