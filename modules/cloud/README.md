@@ -4,13 +4,13 @@
 
 | Name | Version |
 | ---- | ------- |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.49.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 4.77 |
 
 ### Providers
 
 | Name | Version |
 | ---- | ------- |
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.49.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | ~> 4.77 |
 
 ### Modules
 
@@ -24,10 +24,11 @@
 
 | Name | Type |
 | ---- | ---- |
-| [azurerm_resource_group.resource_group](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/resource_group) | resource |
-| [azurerm_user_assigned_identity.runner](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/user_assigned_identity) | resource |
-| [azurerm_resource_group.resource_group](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/data-sources/resource_group) | data source |
-| [azurerm_subscription.subscription](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/data-sources/subscription) | data source |
+| [azurerm_resource_group.resource_group](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
+| [azurerm_user_assigned_identity.runner](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
+| [azurerm_resource_group.resource_group](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) | data source |
+| [azurerm_subscription.subscription](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subscription) | data source |
+| [azurerm_user_assigned_identity.runner](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/user_assigned_identity) | data source |
 
 ### Inputs
 
@@ -56,12 +57,17 @@
 | <a name="input_network_cidr"></a> [network\_cidr](#input\_network\_cidr) | The address space for the Virtual Network in CIDR notation, if it must be created. | `string` | `"10.42.0.0/16"` | no |
 | <a name="input_network_create"></a> [network\_create](#input\_network\_create) | Whether to create a new Virtual Network and Subnet for the runner VMSS. | `bool` | `true` | no |
 | <a name="input_network_name"></a> [network\_name](#input\_network\_name) | The name of the Virtual Network to create if `network_create` is true, or to use. If null, it defaults to the `name` variable followed by `-vnet`. | `string` | `null` | no |
+| <a name="input_registry_container_create"></a> [registry\_container\_create](#input\_registry\_container\_create) | Whether to create the artifact storage container within the storage account. | `bool` | `true` | no |
+| <a name="input_registry_container_id"></a> [registry\_container\_id](#input\_registry\_container\_id) | Id of the container to use for registry | `string` | `null` | no |
 | <a name="input_registry_container_name"></a> [registry\_container\_name](#input\_registry\_container\_name) | The name of the storage container for artifacts. | `string` | `"artifacts"` | no |
 | <a name="input_registry_mount_cache_path"></a> [registry\_mount\_cache\_path](#input\_registry\_mount\_cache\_path) | Local cache path used by Blobfuse2. | `string` | `"/var/cache/blobfuse2"` | no |
 | <a name="input_registry_mount_enabled"></a> [registry\_mount\_enabled](#input\_registry\_mount\_enabled) | Whether to mount the artifacts blob container on all runner instances using Blobfuse2 with managed identity. | `bool` | `true` | no |
 | <a name="input_registry_mount_path"></a> [registry\_mount\_path](#input\_registry\_mount\_path) | Path where the artifacts blob container is mounted on runner instances. | `string` | `"/mnt/registry"` | no |
 | <a name="input_registry_mount_read_only"></a> [registry\_mount\_read\_only](#input\_registry\_mount\_read\_only) | Whether to mount the artifacts blob container in read-only mode on runner instances. | `bool` | `true` | no |
-| <a name="input_registry_storage_account_create"></a> [registry\_storage\_account\_create](#input\_registry\_storage\_account\_create) | Whether to create the artifact storage account and container. | `bool` | `true` | no |
+| <a name="input_registry_resource_group_location"></a> [registry\_resource\_group\_location](#input\_registry\_resource\_group\_location) | n/a | `string` | `null` | no |
+| <a name="input_registry_resource_group_name"></a> [registry\_resource\_group\_name](#input\_registry\_resource\_group\_name) | n/a | `string` | `null` | no |
+| <a name="input_registry_storage_account_create"></a> [registry\_storage\_account\_create](#input\_registry\_storage\_account\_create) | Whether to create the artifact storage account. | `bool` | `true` | no |
+| <a name="input_registry_storage_account_id"></a> [registry\_storage\_account\_id](#input\_registry\_storage\_account\_id) | The id of the storage account for artifacts. | `string` | `null` | no |
 | <a name="input_registry_storage_account_name"></a> [registry\_storage\_account\_name](#input\_registry\_storage\_account\_name) | The name of the storage account for artifacts. If null, it defaults to the `name` variable (sanitized). | `string` | `null` | no |
 | <a name="input_resource_group_create"></a> [resource\_group\_create](#input\_resource\_group\_create) | Whether to create a new resource group or use an existing one. | `bool` | `true` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | The name of the resource group to create if `resource_group_create` is true, or use. If null, it defaults to the `name` variable followed by `-rg`. | `string` | `null` | no |
@@ -72,6 +78,8 @@
 | <a name="input_vm_admin_ssh_public_key"></a> [vm\_admin\_ssh\_public\_key](#input\_vm\_admin\_ssh\_public\_key) | The SSH public key for the administrator user. Example: `file("~/.ssh/id_rsa.pub")`. Either `vm_admin_password` or `vm_ssh_public_key` must be provided. | `string` | `null` | no |
 | <a name="input_vm_admin_username"></a> [vm\_admin\_username](#input\_vm\_admin\_username) | The administrator username for the VM instances. | `string` | `"azdo"` | no |
 | <a name="input_vm_disk_size_gb"></a> [vm\_disk\_size\_gb](#input\_vm\_disk\_size\_gb) | Size for the primary disk of the VMs, in Gb | `number` | `50` | no |
+| <a name="input_vm_identity_create"></a> [vm\_identity\_create](#input\_vm\_identity\_create) | n/a | `bool` | `true` | no |
+| <a name="input_vm_identity_id"></a> [vm\_identity\_id](#input\_vm\_identity\_id) | The name of the User Assigned Identity for the VMs. When null, it defaults to the `name` variable followed by `-id`. | `string` | `null` | no |
 | <a name="input_vm_identity_name"></a> [vm\_identity\_name](#input\_vm\_identity\_name) | The name of the User Assigned Identity for the VMs. When null, it defaults to the `name` variable followed by `-id`. | `string` | `null` | no |
 | <a name="input_vm_image_id"></a> [vm\_image\_id](#input\_vm\_image\_id) | The full resource ID of the custom image to use for the VMs. When null, and `vm_image_name` is not null, value is /subscriptions/${subscription\_id}/resourceGroups/${resource\_group\_name}/providers/Microsoft.Compute/images/${vm\_image\_name} | `string` | `null` | no |
 | <a name="input_vm_image_name"></a> [vm\_image\_name](#input\_vm\_image\_name) | The name of the custom image to use for the VMs. The image is expected to be in the same resource group. | `string` | `null` | no |
@@ -83,9 +91,8 @@
 
 | Name | Description |
 | ---- | ----------- |
-| <a name="output_artifacts_download_example"></a> [artifacts\_download\_example](#output\_artifacts\_download\_example) | n/a |
 | <a name="output_artifacts_mount_path"></a> [artifacts\_mount\_path](#output\_artifacts\_mount\_path) | n/a |
-| <a name="output_artifacts_storage_account_name"></a> [artifacts\_storage\_account\_name](#output\_artifacts\_storage\_account\_name) | n/a |
+| <a name="output_devops_app_registration_client_id"></a> [devops\_app\_registration\_client\_id](#output\_devops\_app\_registration\_client\_id) | n/a |
 | <a name="output_packer_pkrvars"></a> [packer\_pkrvars](#output\_packer\_pkrvars) | n/a |
 <!-- END_TF_DOCS -->
 

@@ -3,8 +3,11 @@ locals {
   resource_group_name         = var.resource_group_create ? azurerm_resource_group.resource_group[0].name : data.azurerm_resource_group.resource_group[0].name
   resource_group_location     = var.resource_group_create ? azurerm_resource_group.resource_group[0].location : data.azurerm_resource_group.resource_group[0].location
 
-  vm_identity_name = coalesce(var.vm_identity_name, "${var.name}-id")
-  vm_identity_principal_id = azurerm_user_assigned_identity.runner.principal_id
+  vm_identity_default_name  = coalesce(var.vm_identity_name, "${var.name}-id")
+  vm_identity_create        = var.vm_identity_id == null ? var.vm_identity_create : false
+  vm_identity_id            = var.vm_identity_id != null ? var.vm_identity_id : var.vm_identity_create ? azurerm_user_assigned_identity.runner[0].id: data.azurerm_user_assigned_identity.runner[0].id
+  vm_identity_name          = var.vm_identity_id != null ? split("/", var.vm_identity_id)[8] : local.vm_identity_default_name
+  vm_identity_principal_id  = local.vm_identity_create ? azurerm_user_assigned_identity.runner[0].principal_id : data.azurerm_user_assigned_identity.runner[0].principal_id
 }
 
 data "azurerm_subscription" "subscription" {
@@ -42,8 +45,16 @@ module "network" {
 }
 
 resource "azurerm_user_assigned_identity" "runner" {
+  count = local.vm_identity_create ? 1 : 0
+
   name                = local.vm_identity_name
   location            = local.resource_group_location
+  resource_group_name = local.resource_group_name
+}
+data "azurerm_user_assigned_identity" "runner" {
+  count = local.vm_identity_create ? 0 : 1
+
+  name                = local.vm_identity_name
   resource_group_name = local.resource_group_name
 }
 
@@ -83,7 +94,7 @@ module "runner" {
 
   subnet_id = module.network.subnet_id
 
-  vm_identity_name    = local.vm_identity_name
+  vm_identity_id      = local.vm_identity_id
   # Because azurerm_user_assigned_identity.runner is listed as dependency, we expect the identity to exist
   vm_identity_create  = false
 

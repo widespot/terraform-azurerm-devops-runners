@@ -59,11 +59,21 @@ variable "nat_gateway_create" {
   default     = true
 }
 
+variable "vm_identity_create" {
+  type        = bool
+  default     = true
+}
 variable "vm_identity_name" {
   type        = string
   description = "The name of the User Assigned Identity for the VMs. When null, it defaults to the `name` variable followed by `-id`."
   default     = null
 }
+variable "vm_identity_id" {
+  type        = string
+  description = "The name of the User Assigned Identity for the VMs. When null, it defaults to the `name` variable followed by `-id`."
+  default     = null
+}
+
 variable "vm_name" {
   type        = string
   description = "The base name for the Virtual Machine instances. When null, it defaults to the `name` variable followed by `-vm`."
