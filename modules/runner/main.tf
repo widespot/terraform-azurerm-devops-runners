@@ -33,15 +33,6 @@ data "azurerm_user_assigned_identity" "runner" {
   name                = local.vm_identity_name
   resource_group_name = local.resource_group_name
 }
-output "vm_identity_name" {
-  value = local.vm_identity_name
-}
-output "vm_identity_id" {
-  value = local.vm_identity_create ? azurerm_user_assigned_identity.runner[0].id : data.azurerm_user_assigned_identity.runner[0].id
-}
-output "vm_identity_principal_id" {
-  value = local.vm_identity_create ? azurerm_user_assigned_identity.runner[0].principal_id : data.azurerm_user_assigned_identity.runner[0].principal_id
-}
 
 resource "azurerm_linux_virtual_machine_scale_set" "runner" {
   count = local.vm_image_id == null ? 0 : 1

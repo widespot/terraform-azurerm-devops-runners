@@ -3,13 +3,13 @@
 
 | Name | Version |
 | ---- | ------- |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.49.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 4.49 |
 
 ### Providers
 
 | Name | Version |
 | ---- | ------- |
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.49.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | ~> 4.49 |
 
 ### Modules
 
@@ -19,16 +19,16 @@ No modules.
 
 | Name | Type |
 | ---- | ---- |
-| [azurerm_nat_gateway.nat](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/nat_gateway) | resource |
-| [azurerm_nat_gateway_public_ip_association.nat](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/nat_gateway_public_ip_association) | resource |
-| [azurerm_network_security_group.subnet_nsg](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/network_security_group) | resource |
-| [azurerm_public_ip.nat](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/public_ip) | resource |
-| [azurerm_subnet.subnet](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/subnet) | resource |
-| [azurerm_subnet_nat_gateway_association.nat](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/subnet_nat_gateway_association) | resource |
-| [azurerm_virtual_network.network](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/resources/virtual_network) | resource |
-| [azurerm_resource_group.resource_group](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/data-sources/resource_group) | data source |
-| [azurerm_subnet.subnet](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/data-sources/subnet) | data source |
-| [azurerm_virtual_network.network](https://registry.terraform.io/providers/hashicorp/azurerm/4.49.0/docs/data-sources/virtual_network) | data source |
+| [azurerm_nat_gateway.nat](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/nat_gateway) | resource |
+| [azurerm_nat_gateway_public_ip_association.nat](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/nat_gateway_public_ip_association) | resource |
+| [azurerm_network_security_group.subnet_nsg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
+| [azurerm_public_ip.nat](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
+| [azurerm_subnet.subnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
+| [azurerm_subnet_nat_gateway_association.nat](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_nat_gateway_association) | resource |
+| [azurerm_virtual_network.network](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
+| [azurerm_resource_group.resource_group](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) | data source |
+| [azurerm_subnet.subnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subnet) | data source |
+| [azurerm_virtual_network.network](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/virtual_network) | data source |
 
 ### Inputs
 
@@ -49,5 +49,23 @@ No modules.
 
 | Name | Description |
 | ---- | ----------- |
-| <a name="output_subnet_id"></a> [subnet\_id](#output\_subnet\_id) | n/a |
+| <a name="output_nat_gateway_id"></a> [nat\_gateway\_id](#output\_nat\_gateway\_id) | The ID of the NAT Gateway if created; null otherwise. |
+| <a name="output_nat_gateway_name"></a> [nat\_gateway\_name](#output\_nat\_gateway\_name) | The name of the NAT Gateway if created; null otherwise. |
+| <a name="output_network_cidr"></a> [network\_cidr](#output\_network\_cidr) | The address space of the Virtual Network. |
+| <a name="output_network_id"></a> [network\_id](#output\_network\_id) | The ID of the Virtual Network. |
+| <a name="output_network_name"></a> [network\_name](#output\_network\_name) | The name of the Virtual Network. |
+| <a name="output_network_security_group_id"></a> [network\_security\_group\_id](#output\_network\_security\_group\_id) | The ID of the Network Security Group. |
+| <a name="output_network_security_group_name"></a> [network\_security\_group\_name](#output\_network\_security\_group\_name) | The name of the Network Security Group. |
+| <a name="output_public_ip_address"></a> [public\_ip\_address](#output\_public\_ip\_address) | The IP address of the Public IP associated with the NAT Gateway if created; null otherwise. |
+| <a name="output_public_ip_id"></a> [public\_ip\_id](#output\_public\_ip\_id) | The ID of the Public IP associated with the NAT Gateway if created; null otherwise. |
+| <a name="output_resource_group_location"></a> [resource\_group\_location](#output\_resource\_group\_location) | The location of the resource group. |
+| <a name="output_resource_group_name"></a> [resource\_group\_name](#output\_resource\_group\_name) | The name of the resource group. |
+| <a name="output_subnet_cidr"></a> [subnet\_cidr](#output\_subnet\_cidr) | The address prefix of the subnet. |
+| <a name="output_subnet_id"></a> [subnet\_id](#output\_subnet\_id) | The ID of the subnet. |
+| <a name="output_subnet_name"></a> [subnet\_name](#output\_subnet\_name) | The name of the subnet. |
 <!-- END_TF_DOCS -->
+
+### Generate this documentation
+```shell
+terraform-docs markdown table --output-file README.md --indent 3 .
+```
